@@ -1,18 +1,7 @@
 image: node:18.10-slim
 
 stages:
-  - build
   - deploy
-
-Build:
-  stage: build
-  rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-  before_script:
-    - cp ${ENV_FILE} .env
-  script:
-    - yarn install --frozen-lockfile
-    - yarn build
 
 Deploy:
   stage: deploy
