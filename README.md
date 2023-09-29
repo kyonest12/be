@@ -2,7 +2,7 @@
 
 1. NodeJS
 2. Yarn
-3. MySQL 8.0 (MySQL server or docker)
+3. Docker
 4. VScode extensions: eslint, prettier
 
 # Initial setup
