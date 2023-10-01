@@ -1,6 +1,6 @@
 import { Exclude, instanceToPlain } from 'class-transformer';
 import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
-import { AccountStatus } from '../../constants/accountStatus.enum';
+import { AccountStatus } from '../../constants/account-status.enum';
 
 @Entity('users')
 export class User extends BaseEntity {

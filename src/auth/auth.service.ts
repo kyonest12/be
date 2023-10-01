@@ -3,11 +3,12 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { compare, hash } from 'bcryptjs';
-import { AccountStatus } from '../constants/accountStatus.enum';
+import { AccountStatus } from '../constants/account-status.enum';
 import { User } from '../database/entities/user.entity';
 import { AppException } from '../exceptions/app.exception';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
+import { jwtSignOptions } from '../constants/jst-sign-options.constant';
 
 @Injectable()
 export class AuthService {
@@ -63,15 +64,11 @@ export class AuthService {
             throw new AppException(9995);
         }
 
-        user.token = this.jwtService.sign(
-            { id: user.id, device_id },
-            {
-                secret: process.env.JWT_SECRET,
-                expiresIn: process.env.JWT_EXPIRATION,
-            },
-        );
+        user.token = this.jwtService.sign({ id: user.id, device_id }, jwtSignOptions);
 
-        return this.userRepo.save(user);
+        await this.userRepo.save(user);
+
+        return { ...user.toJSON(), token: user.token };
     }
 
     async getUserById(id: number): Promise<User> {

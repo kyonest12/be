@@ -45,7 +45,7 @@ yarn start:dev
 -   Generate migration:
 
 ```
-yarn typeorm migration:generate src/database/migrations/MigrationLabel -p
+yarn typeorm migration:generate src/database/migrations/migration_label -p
 ```
 
 -   Run specified seed:

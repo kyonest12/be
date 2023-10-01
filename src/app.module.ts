@@ -7,6 +7,10 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { entities } from './database';
+import { ProfileController } from './modules/profile/profile.controller';
+import { AuthController } from './auth/auth.controller';
+import { TodoController } from './modules/todo/todo.controller';
+import { TodoService } from './modules/todo/todo.service';
 
 @Module({
     imports: [
@@ -18,7 +22,7 @@ import { entities } from './database';
         TypeOrmModule.forRoot(options),
         TypeOrmModule.forFeature(entities),
     ],
-    controllers: [],
-    providers: [],
+    controllers: [AuthController, ProfileController, TodoController],
+    providers: [TodoService],
 })
 export class AppModule {}

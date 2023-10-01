@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
-import { errorMessages } from '../constants/errorMessages.constants';
+import { errorMessages } from '../constants/error-messages.constants';
 
 @Catch()
 export class UncaughtExceptionFilter implements ExceptionFilter {
