@@ -9,6 +9,8 @@ import { join } from 'path';
 import { entities } from './database';
 import { ProfileController } from './modules/profile/profile.controller';
 import { AuthController } from './auth/auth.controller';
+import { TodoController } from './modules/todo/todo.controller';
+import { TodoService } from './modules/todo/todo.service';
 
 @Module({
     imports: [
@@ -20,7 +22,7 @@ import { AuthController } from './auth/auth.controller';
         TypeOrmModule.forRoot(options),
         TypeOrmModule.forFeature(entities),
     ],
-    controllers: [AuthController, ProfileController],
-    providers: [],
+    controllers: [AuthController, ProfileController, TodoController],
+    providers: [TodoService],
 })
 export class AppModule {}

@@ -13,7 +13,6 @@ export class ProfileController {
     @ExampleSuccessResponse({
         id: 1,
         email: 'example@email.com',
-        token: 'string',
         status: -1,
         username: null,
         avatar: null,

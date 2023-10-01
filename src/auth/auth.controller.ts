@@ -1,9 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ExampleSuccessResponse } from '../utils/example-response.decorator';
+import { ExampleResponse, ExampleSuccessResponse } from '../utils/example-response.decorator';
 
 @Controller('/')
 @ApiTags('Auth')
@@ -11,7 +11,7 @@ export class AuthController {
     constructor(private authService: AuthService) {}
 
     @Post('/signup')
-    @ExampleSuccessResponse({
+    @ExampleResponse(201, {
         id: 1,
         email: 'example@email.com',
         token: 'string',
@@ -34,6 +34,7 @@ export class AuthController {
         avatar: null,
         coins: 0,
     })
+    @HttpCode(200)
     async login(@Body() body: LoginDto) {
         return this.authService.login(body);
     }
