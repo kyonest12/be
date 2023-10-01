@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { entities } from './database';
+import { ProfileController } from './modules/profile/profile.controller';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
     imports: [
@@ -18,7 +20,7 @@ import { entities } from './database';
         TypeOrmModule.forRoot(options),
         TypeOrmModule.forFeature(entities),
     ],
-    controllers: [],
+    controllers: [AuthController, ProfileController],
     providers: [],
 })
 export class AppModule {}

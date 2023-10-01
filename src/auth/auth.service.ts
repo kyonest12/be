@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { compare, hash } from 'bcryptjs';
-import { AccountStatus } from '../constants/accountStatus.enum';
+import { AccountStatus } from '../constants/account-status.enum';
 import { User } from '../database/entities/user.entity';
 import { AppException } from '../exceptions/app.exception';
 import { LoginDto } from './dto/login.dto';
