@@ -38,10 +38,10 @@ export class TodoService {
 
     async one(user_id: number, id: number) {
         const todo = await this.todoRepo.findOne({
-            where: {
-                id,
-                user_id,
-            },
+            where: [
+                { id, user_id },
+                { id, is_public: true },
+            ],
             relations: ['user'],
         });
 

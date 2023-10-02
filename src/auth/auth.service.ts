@@ -36,7 +36,9 @@ export class AuthService {
             throw new AppException(9996);
         }
 
-        // todo: validate password
+        if (password.indexOf(email) != -1) {
+            throw new AppException(9995);
+        }
 
         const user = new User({
             email,
