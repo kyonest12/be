@@ -23,6 +23,7 @@
     "deploy:migrate": "node ./node_modules/typeorm/cli.js -d dist/database/orm.config.js migration:run"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.9.1",
     "@nestjs/common": "^10.1.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
@@ -40,6 +41,7 @@
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.5",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "pg": "^8.11.3",
@@ -58,6 +60,7 @@
     "@types/jest": "^28.1.4",
     "@types/multer": "^1.4.7",
     "@types/node": "^18.0.3",
+    "@types/nodemailer": "^6.4.11",
     "@types/passport-jwt": "^3.0.7",
     "@types/pg": "^8.10.3",
     "@types/supertest": "^2.0.12",

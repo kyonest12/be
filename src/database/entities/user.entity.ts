@@ -1,6 +1,7 @@
 import { Exclude, instanceToPlain } from 'class-transformer';
-import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { AccountStatus } from '../../constants/account-status.enum';
+import { VerifyCode } from './verify-code.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -30,6 +31,9 @@ export class User extends BaseEntity {
 
     @Column({ default: 0 })
     coins: number;
+
+    @OneToMany(() => VerifyCode, (verify_code) => verify_code.user)
+    verify_codes: VerifyCode[];
 
     constructor(props: Partial<User>) {
         super();
