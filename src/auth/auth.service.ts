@@ -117,10 +117,11 @@ export class AuthService {
             expired_at: dayjs().add(30, 'minutes').toDate(),
         });
 
+        await this.verifyCodeRepo.update({ user_id: user.id }, { status: VerifyCodeStatus.INACTIVE });
         await this.verifyCodeRepo.save(verifyCode);
         await this.mailerService.sendMail({
-            from: process.env.SMTP_EMAIL_FROM,
             to: email,
+            subject: 'Verify code',
             text: `This is your verify code ${code} `,
         });
 
@@ -136,6 +137,7 @@ export class AuthService {
                 },
                 expired_at: MoreThan(new Date()),
             },
+            relations: ['user'],
         });
         if (!verifyCode) {
             throw new AppException(9993);

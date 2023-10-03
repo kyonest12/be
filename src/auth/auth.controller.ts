@@ -42,11 +42,7 @@ export class AuthController {
     }
 
     @Get('/get_verify_code')
-    @ExampleSuccessResponse({
-        email: 'example@email.com',
-        code: '123456',
-        expired: '10',
-    })
+    @ExampleSuccessResponse({})
     async getVerifyCode(@Query() query: GetVerifyCodeDto) {
         return this.authService.getVerifyCode(query.email);
     }

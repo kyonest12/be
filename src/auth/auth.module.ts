@@ -17,11 +17,14 @@ import { VerifyCode } from '../database/entities/verify-code.entity';
         TypeOrmModule.forFeature([User, VerifyCode]),
         MailerModule.forRoot({
             transport: {
-                host: 'smtp.gmail.com',
+                host: process.env.SMTP_HOST,
                 auth: {
                     user: process.env.SMTP_USER,
                     pass: process.env.SMTP_PASSWORD,
                 },
+            },
+            defaults: {
+                from: `"Info" <${process.env.SMTP_EMAIL_FROM}>`,
             },
         }),
     ],
