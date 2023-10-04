@@ -72,7 +72,17 @@ export class AuthService {
 
         return { ...user.toJSON(), token: user.token };
     }
-
+    async logout(userId: number) {
+        const user = await this.userRepo.findOne({
+            where: { id: userId },
+        });
+        if (user) {
+                 user.token = " "; 
+            await this.userRepo.save(user);
+        } else {
+            throw new AppException(9997); 
+        }
+    }
     async getUserById(id: number): Promise<User> {
         const user = await this.userRepo.findOne({
             where: {
@@ -86,7 +96,7 @@ export class AuthService {
 
         return user;
     }
-
+   
     async changePassword(user: User, { oldPassword, newPassword }) {
         if (!user || !(await this.comparePassword(user, oldPassword))) {
             throw new AppException(9995);
