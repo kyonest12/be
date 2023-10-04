@@ -2,11 +2,13 @@ import { Body, Controller, HttpCode, Post, Get, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
+import { User } from '../database/entities/user.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { ExampleResponse, ExampleSuccessResponse } from '../utils/example-response.decorator';
 import { GetVerifyCodeDto } from './dto/get-verify-code.dto';
 import { CheckVerifyCodeDto } from './dto/check-verify-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { AuthUser } from './decorators/user.decorator';
 
 @Controller('/')
 @ApiTags('Auth')
@@ -40,6 +42,10 @@ export class AuthController {
     @HttpCode(200)
     async login(@Body() body: LoginDto) {
         return this.authService.login(body);
+    }
+    @Post('/logout')
+    async logout(@AuthUser() user: User) {
+        return this.authService.logout(user);
     }
 
     @Get('/get_verify_code')
