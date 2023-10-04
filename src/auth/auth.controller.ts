@@ -9,6 +9,7 @@ import { GetVerifyCodeDto } from './dto/get-verify-code.dto';
 import { CheckVerifyCodeDto } from './dto/check-verify-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthUser } from './decorators/user.decorator';
+import { Auth } from './decorators/auth.decorator';
 
 @Controller('/')
 @ApiTags('Auth')
@@ -43,7 +44,10 @@ export class AuthController {
     async login(@Body() body: LoginDto) {
         return this.authService.login(body);
     }
+
     @Post('/logout')
+    @Auth()
+    @ExampleSuccessResponse({})
     async logout(@AuthUser() user: User) {
         return this.authService.logout(user);
     }
