@@ -6,6 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ExampleResponse, ExampleSuccessResponse } from '../utils/example-response.decorator';
 import { GetVerifyCodeDto } from './dto/get-verify-code.dto';
 import { CheckVerifyCodeDto } from './dto/check-verify-code.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('/')
 @ApiTags('Auth')
@@ -58,7 +59,22 @@ export class AuthController {
         coins: 0,
     })
     @HttpCode(200)
-    async checkVerifyCode(@Body() body: CheckVerifyCodeDto) {
-        return this.authService.checkVerifyCode(body.email, body.code);
+    async checkVerifyCode(@Body() { email, code }: CheckVerifyCodeDto) {
+        return this.authService.checkVerifyCode(email, code);
+    }
+
+    @Post('/reset_password')
+    @ExampleSuccessResponse({
+        id: 1,
+        email: 'example@email.com',
+        token: 'string',
+        status: -1,
+        username: null,
+        avatar: null,
+        coins: 0,
+    })
+    @HttpCode(200)
+    async resetPassword(@Body() { email, code, password }: ResetPasswordDto) {
+        return this.authService.resetPassword(email, code, password);
     }
 }

@@ -26,9 +26,8 @@ export class AuthService {
         private verifyCodeRepo: Repository<VerifyCode>,
     ) {}
 
-    async hashPassword(user: User) {
-        user.password = await hash(user.password, 10);
-        return user;
+    async hashPassword(password: string) {
+        return hash(password, 10);
     }
 
     async comparePassword(user: User, password: string) {
@@ -50,10 +49,8 @@ export class AuthService {
 
         const user = new User({
             email,
-            password,
+            password: await this.hashPassword(password),
         });
-
-        await this.hashPassword(user);
         await this.userRepo.save(user);
 
         return this.login({ email, password, device_id });
@@ -128,13 +125,14 @@ export class AuthService {
         return {};
     }
 
-    async checkVerifyCode(email: string, code: string) {
+    async verifyCode(email: string, code: string) {
         const verifyCode = await this.verifyCodeRepo.findOne({
             where: {
                 status: VerifyCodeStatus.ACTIVE,
                 user: {
                     email,
                 },
+                code,
                 expired_at: MoreThan(new Date()),
             },
             relations: ['user'],
@@ -143,16 +141,30 @@ export class AuthService {
             throw new AppException(9993);
         }
 
+        verifyCode.status = VerifyCodeStatus.INACTIVE;
+        return this.verifyCodeRepo.save(verifyCode);
+    }
+
+    async checkVerifyCode(email: string, code: string) {
+        const verifyCode = await this.verifyCode(email, code);
+
         const user = verifyCode.user;
         user.token = this.jwtService.sign({ id: user.id, code }, { secret: process.env.JWT_SECRET, expiresIn: '30m' });
         await this.userRepo.save(user);
-
-        verifyCode.status = VerifyCodeStatus.INACTIVE;
-        await this.verifyCodeRepo.save(verifyCode);
 
         return {
             ...user,
             token: user.token,
         };
+    }
+
+    async resetPassword(email: string, code: string, password: string) {
+        const verifyCode = await this.verifyCode(email, code);
+
+        const user = verifyCode.user;
+        user.password = await this.hashPassword(password);
+        user.token = null;
+
+        return this.userRepo.save(user);
     }
 }

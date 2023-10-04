@@ -17,8 +17,8 @@ export class User extends BaseEntity {
     password: string;
 
     @Exclude()
-    @Column({ nullable: true })
-    token: string;
+    @Column('varchar', { nullable: true })
+    token: string | null;
 
     @Column('int2', { default: AccountStatus.PENDING })
     status: AccountStatus;
