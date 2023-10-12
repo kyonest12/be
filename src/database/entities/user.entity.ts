@@ -41,6 +41,9 @@ export class User extends BaseEntity {
     }
 
     toJSON() {
+        if (this.avatar) {
+            this.avatar = `${process.env.APP_URL}/files/${this.avatar}`;
+        }
         return instanceToPlain(this);
     }
 }

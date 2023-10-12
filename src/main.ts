@@ -1,4 +1,3 @@
-import { IsEmail } from 'class-validator';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { UncaughtExceptionFilter } from './exceptions/uncaught-exception.filter';
@@ -22,10 +21,10 @@ async function bootstrap() {
             exceptionFactory: (errors) => {
                 const results = errors.map((error) => ({
                     wrong_input: error.property,
-                    message: error.constraints
+                    message: error.constraints,
                 }));
                 return new AppException(1003, 400, results);
-              },
+            },
         }),
     );
 
