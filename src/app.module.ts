@@ -14,6 +14,8 @@ import { TodoService } from './modules/todo/todo.service';
 import { ProfileService } from './modules/profile/profile.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { PostController } from './modules/post/post.controller';
+import { PostService } from './modules/post/post.service';
 
 @Module({
     imports: [
@@ -37,7 +39,7 @@ import { diskStorage } from 'multer';
             }),
         }),
     ],
-    controllers: [AuthController, ProfileController, TodoController],
-    providers: [TodoService, ProfileService],
+    controllers: [AuthController, ProfileController, PostController, TodoController],
+    providers: [TodoService, ProfileService, PostService],
 })
 export class AppModule {}
