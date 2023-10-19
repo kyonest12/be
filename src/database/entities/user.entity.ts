@@ -17,10 +17,10 @@ export class User extends BaseEntity {
     password: string;
 
     @Exclude()
-    @Column('varchar', { nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     token: string | null;
 
-    @Column('int2', { default: AccountStatus.PENDING })
+    @Column({ type: 'int2', default: AccountStatus.PENDING })
     status: AccountStatus;
 
     @Column({ nullable: true })
@@ -32,7 +32,7 @@ export class User extends BaseEntity {
     @Column({ default: 0 })
     coins: number;
 
-    @OneToMany(() => VerifyCode, (verify_code) => verify_code.user)
+    @OneToMany(() => VerifyCode, (verify_code) => verify_code.user, { cascade: true })
     verify_codes: VerifyCode[];
 
     constructor(props: Partial<User>) {
