@@ -16,7 +16,7 @@ export class UserGuard extends AuthGuard('jwt') {
         const req = context.switchToHttp().getRequest();
         const user = await this.authService.getUserById(req.user.id);
         const token = req.headers['authorization'].slice(7);
-        if (req.user.token !== token) {
+        if (user.token !== token) {
             throw new AppException(9998);
         }
         req.user = user;

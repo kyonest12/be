@@ -20,9 +20,7 @@ export class VerifyCode extends BaseEntity {
     @Column('int2', { default: VerifyCodeStatus.ACTIVE })
     status: VerifyCodeStatus;
 
-    @ManyToOne(() => User, (user) => user.verify_codes, {
-        onDelete: 'CASCADE',
-    })
+    @ManyToOne(() => User, (user) => user.verify_codes, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user: User;
 

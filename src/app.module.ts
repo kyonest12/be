@@ -5,24 +5,41 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'path';
+import { extname, join } from 'path';
 import { entities } from './database';
 import { ProfileController } from './modules/profile/profile.controller';
 import { AuthController } from './auth/auth.controller';
 import { TodoController } from './modules/todo/todo.controller';
 import { TodoService } from './modules/todo/todo.service';
+import { ProfileService } from './modules/profile/profile.service';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { PostController } from './modules/post/post.controller';
+import { PostService } from './modules/post/post.service';
 
 @Module({
     imports: [
         AuthModule,
         ServeStaticModule.forRoot({
             rootPath: join(__dirname, '..', 'uploads'),
+            serveRoot: '/files',
         }),
         ConfigModule.forRoot(),
         TypeOrmModule.forRoot(options),
         TypeOrmModule.forFeature(entities),
+        MulterModule.register({
+            storage: diskStorage({
+                destination: (req, file, cb) => {
+                    cb(null, 'uploads/');
+                },
+                filename: (req, file, cb) => {
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    cb(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
+                },
+            }),
+        }),
     ],
-    controllers: [AuthController, ProfileController, TodoController],
-    providers: [TodoService],
+    controllers: [AuthController, ProfileController, PostController, TodoController],
+    providers: [TodoService, ProfileService, PostService],
 })
 export class AppModule {}

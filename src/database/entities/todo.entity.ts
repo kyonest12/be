@@ -22,7 +22,7 @@ export class Todo extends BaseEntity {
     @Column()
     title: string;
 
-    @Column('text', { nullable: true })
+    @Column({ type: 'text', nullable: true })
     description: string;
 
     @Column({ default: false })
@@ -40,9 +40,7 @@ export class Todo extends BaseEntity {
     @UpdateDateColumn({ type: 'timestamptz' })
     updated_at: Date;
 
-    @ManyToOne(() => User, {
-        onDelete: 'CASCADE',
-    })
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
     user: User;
 
