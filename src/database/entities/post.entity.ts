@@ -4,7 +4,6 @@ import {
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
-    JoinColumn,
     ManyToOne,
     OneToMany,
     OneToOne,
@@ -23,8 +22,8 @@ export class Post extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    author_id: number;
+    @Column({ type: 'int' })
+    authorId: number;
 
     @Column({ type: 'text', nullable: true })
     descriptions: string;
@@ -32,24 +31,22 @@ export class Post extends BaseEntity {
     @Column({ type: 'int', default: 0 })
     edited: number;
 
-    @Column({ nullable: true })
-    category_id: number;
+    @Column({ type: 'int', nullable: true })
+    categoryId: number | null;
 
     @CreateDateColumn({ type: 'timestamptz' })
-    created_at: Date;
+    createdAt: Date;
 
     @UpdateDateColumn({ type: 'timestamptz' })
-    updated_at: Date;
+    updatedAt: Date;
 
     @DeleteDateColumn({ type: 'timestamptz' })
-    deleted_at: Date;
+    deletedAt: Date;
 
     @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'author_id' })
     author: User;
 
     @ManyToOne(() => Category, (category) => category.posts, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'category_id' })
     category: Category;
 
     @OneToMany(() => PostImage, (image) => image.post, { cascade: true })

@@ -1,7 +1,5 @@
-import { Exclude, instanceToPlain } from 'class-transformer';
-import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { AccountStatus } from '../../constants/account-status.enum';
-import { VerifyCode } from './verify-code.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -9,41 +7,35 @@ export class User extends BaseEntity {
     id: number;
 
     @Index({ unique: true })
-    @Column()
+    @Column({ type: 'varchar' })
     email: string;
 
-    @Exclude()
-    @Column()
+    @Column({ type: 'varchar' })
     password: string;
 
-    @Exclude()
     @Column({ type: 'varchar', nullable: true })
     token: string | null;
 
     @Column({ type: 'int2', default: AccountStatus.PENDING })
     status: AccountStatus;
 
-    @Column({ nullable: true })
-    username: string;
+    @Column({ type: 'varchar', nullable: true })
+    username: string | null;
 
-    @Column({ nullable: true })
-    avatar: string;
+    @Column({ type: 'varchar', nullable: true })
+    avatar: string | null;
 
-    @Column({ default: 0 })
+    @Column({ type: 'int', default: 0 })
     coins: number;
 
-    @OneToMany(() => VerifyCode, (verify_code) => verify_code.user, { cascade: true })
-    verify_codes: VerifyCode[];
+    @CreateDateColumn({ type: 'timestamptz' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamptz' })
+    updatedAt: Date;
 
     constructor(props: Partial<User>) {
         super();
         Object.assign(this, props);
-    }
-
-    toJSON() {
-        if (this.avatar) {
-            this.avatar = `${process.env.APP_URL}/files/${this.avatar}`;
-        }
-        return instanceToPlain(this);
     }
 }

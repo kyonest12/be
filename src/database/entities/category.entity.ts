@@ -6,11 +6,11 @@ export class Category extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: true })
-    name: string;
+    @Column({ type: 'varchar', nullable: true })
+    name: string | null;
 
     @Column({ type: 'boolean', default: false })
-    has_name: boolean;
+    hasName: boolean;
 
     @OneToMany(() => Post, (post) => post.category)
     posts: Post[];

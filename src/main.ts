@@ -44,6 +44,8 @@ async function bootstrap() {
     SwaggerModule.setup('/', app, document, {
         swaggerOptions: {
             docExpansion: 'none',
+            defaultModelExpandDepth: 1000,
+            defaultModelsExpandDepth: 1000,
         },
     });
 

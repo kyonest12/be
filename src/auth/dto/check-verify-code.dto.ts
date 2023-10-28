@@ -9,5 +9,5 @@ export class CheckVerifyCodeDto {
     @ApiProperty({ example: '123456' })
     @IsString()
     @Matches(/^\d+/)
-    code: string;
+    code_verify: string;
 }
