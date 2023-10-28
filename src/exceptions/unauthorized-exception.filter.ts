@@ -7,7 +7,7 @@ export class UnauthorizedExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const res = ctx.getResponse();
         res.status(exception.getStatus()).json({
-            code: 9998,
+            code: '9998',
             message: errorMessages[9998],
         });
     }

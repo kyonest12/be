@@ -11,7 +11,7 @@ export class UncaughtExceptionFilter implements ExceptionFilter {
         console.error(exception);
 
         res.status(500).json({
-            code: 1005,
+            code: '1005',
             message: errorMessages[1005],
             error: exception.response,
         });

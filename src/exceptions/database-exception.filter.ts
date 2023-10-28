@@ -7,7 +7,7 @@ export class DatabaseExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const res = ctx.getResponse();
         res.status(400).json({
-            code: 5001,
+            code: '5001',
             message: 'Database exception',
             error: exception,
         });
