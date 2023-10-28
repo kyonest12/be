@@ -1,5 +1,4 @@
-import { instanceToPlain } from 'class-transformer';
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 import { VerifyCodeStatus } from '../../constants/verify-code-status.enum';
 
@@ -8,28 +7,23 @@ export class VerifyCode extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    user_id: number;
+    @Column({ type: 'int' })
+    userId: number;
 
-    @Column()
+    @Column({ type: 'varchar' })
     code: string;
 
-    @Column('timestamptz')
-    expired_at: Date;
+    @Column({ type: 'timestamptz' })
+    expiredAt: Date;
 
-    @Column('int2', { default: VerifyCodeStatus.ACTIVE })
+    @Column({ type: 'int2', default: VerifyCodeStatus.ACTIVE })
     status: VerifyCodeStatus;
 
-    @ManyToOne(() => User, (user) => user.verify_codes, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
     user: User;
 
     constructor(props: Partial<VerifyCode>) {
         super();
         Object.assign(this, props);
-    }
-
-    toJSON() {
-        return instanceToPlain(this);
     }
 }

@@ -12,5 +12,5 @@ export class LoginDto {
 
     @ApiProperty({ example: 'string' })
     @IsString()
-    device_id: string;
+    uuid: string;
 }

@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    BaseEntity,
+    Column,
+    CreateDateColumn,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { FeelType } from '../../constants/feel-type.enum';
 import { Post } from './post.entity';
 import { User } from './user.entity';
@@ -8,21 +16,25 @@ export class Feel extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    post_id: number;
+    @Column({ type: 'int' })
+    postId: number;
 
     @Column({ type: 'int2' })
     type: FeelType;
 
-    @Column()
-    user_id: number;
+    @Column({ type: 'int' })
+    userId: number;
+
+    @CreateDateColumn({ type: 'timestamptz' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamptz' })
+    updatedAt: Date;
 
     @ManyToOne(() => Post, (post) => post.feels, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'post_id' })
     post: Post;
 
     @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
     user: User;
 
     constructor(props: Partial<Feel>) {

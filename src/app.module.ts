@@ -9,8 +9,6 @@ import { extname, join } from 'path';
 import { entities } from './database';
 import { ProfileController } from './modules/profile/profile.controller';
 import { AuthController } from './auth/auth.controller';
-import { TodoController } from './modules/todo/todo.controller';
-import { TodoService } from './modules/todo/todo.service';
 import { ProfileService } from './modules/profile/profile.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -39,7 +37,7 @@ import { PostService } from './modules/post/post.service';
             }),
         }),
     ],
-    controllers: [AuthController, ProfileController, PostController, TodoController],
-    providers: [TodoService, ProfileService, PostService],
+    controllers: [AuthController, ProfileController],
+    providers: [ProfileService, PostService],
 })
 export class AppModule {}

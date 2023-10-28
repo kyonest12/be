@@ -38,7 +38,7 @@ export class AuthService {
         return this.userRepo.findOneBy({ email });
     }
 
-    async signup({ email, password, device_id }: SignupDto) {
+    async signup({ email, password }: SignupDto) {
         if (await this.doesEmailExist(email)) {
             throw new AppException(9996);
         }
@@ -50,13 +50,15 @@ export class AuthService {
         const user = new User({
             email,
             password: await this.hashPassword(password),
+            status: AccountStatus.INACTIVE,
         });
         await this.userRepo.save(user);
+        await this.getVerifyCode(email);
 
-        return this.login({ email, password, device_id });
+        return {};
     }
 
-    async login({ email, password, device_id }: LoginDto) {
+    async login({ email, password, uuid: device_id }: LoginDto) {
         const user = await this.userRepo.findOne({
             where: {
                 email: email.toLowerCase(),
@@ -67,20 +69,24 @@ export class AuthService {
             throw new AppException(9995); // todo
         }
 
-        if (user.status === AccountStatus.INACTIVE) {
-            throw new AppException(9995);
-        }
-
         user.token = this.jwtService.sign({ id: user.id, device_id }, jwtSignOptions);
-
         await this.userRepo.save(user);
 
-        return { ...user.toJSON(), token: user.token };
+        return {
+            id: String(user.id),
+            username: user.username || '',
+            token: user.token,
+            avatar: user.avatar || '',
+            active: String(user.status),
+            coins: String(user.coins),
+        };
     }
 
     async logout(user: User) {
         user.token = null;
         await this.userRepo.save(user);
+
+        return {};
     }
 
     async getUserById(id: number): Promise<User> {
@@ -104,7 +110,7 @@ export class AuthService {
         user.password = await hash(newPassword, 10);
         await this.userRepo.save(user);
 
-        return user;
+        return {};
     }
 
     async getVerifyCode(email: string) {
@@ -116,10 +122,10 @@ export class AuthService {
         const verifyCode = new VerifyCode({
             user,
             code,
-            expired_at: dayjs().add(30, 'minutes').toDate(),
+            expiredAt: dayjs().add(30, 'minutes').toDate(),
         });
 
-        await this.verifyCodeRepo.update({ user_id: user.id }, { status: VerifyCodeStatus.INACTIVE });
+        await this.verifyCodeRepo.update({ userId: user.id }, { status: VerifyCodeStatus.INACTIVE });
         await this.verifyCodeRepo.save(verifyCode);
         await this.mailerService.sendMail({
             to: email,
@@ -138,7 +144,7 @@ export class AuthService {
                     email,
                 },
                 code,
-                expired_at: MoreThan(new Date()),
+                expiredAt: MoreThan(new Date()),
             },
             relations: ['user'],
         });
@@ -154,12 +160,14 @@ export class AuthService {
         const verifyCode = await this.verifyCode(email, code);
 
         const user = verifyCode.user;
-        user.token = this.jwtService.sign({ id: user.id, code }, { secret: process.env.JWT_SECRET, expiresIn: '30m' });
-        await this.userRepo.save(user);
+        if (user.status === AccountStatus.INACTIVE) {
+            user.status = AccountStatus.PENDING;
+            await this.userRepo.save(user);
+        }
 
         return {
-            ...user,
-            token: user.token,
+            id: String(user.id),
+            active: String(user.status),
         };
     }
 
@@ -170,6 +178,6 @@ export class AuthService {
         user.password = await this.hashPassword(password);
         user.token = null;
 
-        return this.userRepo.save(user);
+        return {};
     }
 }

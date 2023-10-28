@@ -1,6 +1,5 @@
-import { Controller, Get, Post, HttpCode, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
+import { Controller, Post, HttpCode, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
 import { Auth } from '../../auth/decorators/auth.decorator';
-import { ExampleSuccessResponse } from '../../utils/example-response.decorator';
 import { AuthUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../database/entities/user.entity';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -14,29 +13,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class ProfileController {
     constructor(private profileService: ProfileService) {}
 
-    @Get('/get_user_info')
-    @ExampleSuccessResponse({
-        id: 1,
-        email: 'example@email.com',
-        status: -1,
-        username: 'string | null',
-        avatar: 'string | null',
-        coins: 0,
-    })
-    async getProfile(@AuthUser() user: User) {
-        return user;
-    }
+    // @Post('/get_user_info')
+    // async getProfile(@AuthUser() user: User) {
+    //     return user;
+    // }
 
     @Post('/change_profile_after_signup')
     @ApiConsumes('multipart/form-data')
-    @ExampleSuccessResponse({
-        id: 1,
-        email: 'example@email.com',
-        status: -1,
-        username: 'string | null',
-        avatar: 'string | null',
-        coins: 0,
-    })
     @UseInterceptors(FileInterceptor('avatar'))
     @HttpCode(200)
     async changeProfileAfterSignup(

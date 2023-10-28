@@ -15,7 +15,7 @@ export const options: PostgresConnectionOptions = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
-    ssl: {
+    ssl: process.env.MODE === 'development' && {
         rejectUnauthorized: false,
     },
     entities: [join(__dirname, '/entities/*{.ts,.js}')],
@@ -23,7 +23,7 @@ export const options: PostgresConnectionOptions = {
     logging: process.env.MODE === 'development',
 };
 
-const dataSource = new DataSource(options);
+const dataSource = new DataSource({ ...options });
 dataSource.initialize();
 
 export default dataSource;
