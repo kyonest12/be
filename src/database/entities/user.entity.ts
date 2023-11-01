@@ -16,7 +16,7 @@ export class User extends BaseEntity {
     @Column({ type: 'varchar', nullable: true })
     token: string | null;
 
-    @Column({ type: 'int2', default: AccountStatus.PENDING })
+    @Column({ type: 'int2', default: AccountStatus.Pending })
     status: AccountStatus;
 
     @Column({ type: 'varchar', nullable: true })

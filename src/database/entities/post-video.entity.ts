@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from './post.entity';
 
 @Entity('post_videos')
@@ -13,6 +13,7 @@ export class PostVideo extends BaseEntity {
     url: string;
 
     @OneToOne(() => Post, (post) => post.video, { onDelete: 'CASCADE' })
+    @JoinColumn()
     post: Post;
 
     constructor(props: Partial<PostVideo>) {

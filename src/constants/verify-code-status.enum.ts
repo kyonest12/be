@@ -1,4 +1,4 @@
 export enum VerifyCodeStatus {
-    INACTIVE = 0,
-    ACTIVE = 1,
+    Inactive = 0,
+    Active = 1,
 }

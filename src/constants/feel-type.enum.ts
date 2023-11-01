@@ -1,4 +1,4 @@
 export enum FeelType {
-    KUDOS = 1,
-    DISAPPOINTED = 0,
+    Kudos = 1,
+    Disappointed = 0,
 }

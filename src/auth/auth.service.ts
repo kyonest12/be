@@ -50,7 +50,7 @@ export class AuthService {
         const user = new User({
             email,
             password: await this.hashPassword(password),
-            status: AccountStatus.INACTIVE,
+            status: AccountStatus.Inactive,
         });
         await this.userRepo.save(user);
         await this.getVerifyCode(email);
@@ -96,7 +96,7 @@ export class AuthService {
             },
         });
 
-        if (!user || user?.status === AccountStatus.INACTIVE) {
+        if (!user || user?.status === AccountStatus.Inactive) {
             throw new AppException(9995);
         }
 
@@ -125,7 +125,7 @@ export class AuthService {
             expiredAt: dayjs().add(30, 'minutes').toDate(),
         });
 
-        await this.verifyCodeRepo.update({ userId: user.id }, { status: VerifyCodeStatus.INACTIVE });
+        await this.verifyCodeRepo.update({ userId: user.id }, { status: VerifyCodeStatus.Inactive });
         await this.verifyCodeRepo.save(verifyCode);
         await this.mailerService.sendMail({
             to: email,
@@ -139,7 +139,7 @@ export class AuthService {
     async verifyCode(email: string, code: string) {
         const verifyCode = await this.verifyCodeRepo.findOne({
             where: {
-                status: VerifyCodeStatus.ACTIVE,
+                status: VerifyCodeStatus.Active,
                 user: {
                     email,
                 },
@@ -152,7 +152,7 @@ export class AuthService {
             throw new AppException(9993);
         }
 
-        verifyCode.status = VerifyCodeStatus.INACTIVE;
+        verifyCode.status = VerifyCodeStatus.Inactive;
         return this.verifyCodeRepo.save(verifyCode);
     }
 
@@ -160,8 +160,8 @@ export class AuthService {
         const verifyCode = await this.verifyCode(email, code);
 
         const user = verifyCode.user;
-        if (user.status === AccountStatus.INACTIVE) {
-            user.status = AccountStatus.PENDING;
+        if (user.status === AccountStatus.Inactive) {
+            user.status = AccountStatus.Pending;
             await this.userRepo.save(user);
         }
 

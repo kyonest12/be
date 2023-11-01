@@ -1,4 +1,4 @@
 export enum MarkType {
-    TRUST = 1,
-    FAKE = 0,
+    Trust = 1,
+    Fake = 0,
 }

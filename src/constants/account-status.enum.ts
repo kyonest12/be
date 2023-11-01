@@ -1,5 +1,5 @@
 export enum AccountStatus {
-    PENDING = -1,
-    INACTIVE = 0,
-    ACTIVE = 1,
+    Pending = -1,
+    Inactive = 0,
+    Active = 1,
 }

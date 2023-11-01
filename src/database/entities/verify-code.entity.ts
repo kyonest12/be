@@ -16,7 +16,7 @@ export class VerifyCode extends BaseEntity {
     @Column({ type: 'timestamptz' })
     expiredAt: Date;
 
-    @Column({ type: 'int2', default: VerifyCodeStatus.ACTIVE })
+    @Column({ type: 'int2', default: VerifyCodeStatus.Active })
     status: VerifyCodeStatus;
 
     @ManyToOne(() => User, { onDelete: 'CASCADE' })

@@ -6,7 +6,7 @@ export class ResetPasswordDto {
     @IsEmail()
     email: string;
 
-    @ApiProperty({ example: 123456 })
+    @ApiProperty({ example: '123456' })
     @IsString()
     @Matches(/^\d+/)
     code: string;

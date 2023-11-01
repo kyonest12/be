@@ -14,14 +14,14 @@ export class ProfileService {
     ) {}
 
     async changeProfileAfterSignup(user: User, body: ChangeProfileAfterSignupDto, file?: Express.Multer.File) {
-        if (user.status !== AccountStatus.PENDING) {
+        if (user.status !== AccountStatus.Pending) {
             throw new AppException(9995);
         }
         user.username = body.username;
         if (file) {
             user.avatar = `${process.env.APP_URL}/files/${file.filename}`;
         }
-        user.status = AccountStatus.ACTIVE;
+        user.status = AccountStatus.Active;
         await this.userRepository.save(user);
 
         return {

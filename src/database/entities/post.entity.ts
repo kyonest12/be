@@ -16,6 +16,7 @@ import { PostImage } from './post-image.entity';
 import { PostVideo } from './post-video.entity';
 import { Mark } from './mark.entity';
 import { Feel } from './feel.entity';
+import { Report } from './report.entity';
 
 @Entity('posts')
 export class Post extends BaseEntity {
@@ -26,7 +27,7 @@ export class Post extends BaseEntity {
     authorId: number;
 
     @Column({ type: 'text', nullable: true })
-    descriptions: string;
+    description: string;
 
     @Column({ type: 'int', default: 0 })
     edited: number;
@@ -60,6 +61,9 @@ export class Post extends BaseEntity {
 
     @OneToMany(() => Mark, (mark) => mark.post)
     marks: Mark[];
+
+    @OneToMany(() => Report, (report) => report.post)
+    reports: Report[];
 
     constructor(props: Partial<Post>) {
         super();
