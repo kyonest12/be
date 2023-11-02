@@ -27,7 +27,10 @@ export class Post extends BaseEntity {
     authorId: number;
 
     @Column({ type: 'text', nullable: true })
-    description: string;
+    description: string | null;
+
+    @Column({ type: 'varchar', nullable: true })
+    status: string | null;
 
     @Column({ type: 'int', default: 0 })
     edited: number;
