@@ -12,6 +12,9 @@ export class PostImage extends BaseEntity {
     @Column({ type: 'varchar' })
     url: string;
 
+    @Column({ type: 'int2', default: 0 })
+    order: number;
+
     @ManyToOne(() => Post, (post) => post.images, { onDelete: 'CASCADE' })
     post: Post;
 
