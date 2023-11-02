@@ -1,16 +1,25 @@
 import { FileValidator, ParseFilePipe } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { FilesArrayMaxSizeValidator, FilesArrayTypeValidator } from '../../../utils/image-validation.util';
-import { Allow } from 'class-validator';
+import { Allow, IsOptional, IsString } from 'class-validator';
 
 export class AddPostDto {
     @ApiProperty({ required: false, type: 'array', items: { type: 'file' } })
     @Allow()
-    images: any[];
+    image: any;
 
     @ApiProperty({ required: false, type: 'file' })
     @Allow()
     video: any;
+
+    @ApiProperty({ required: false, type: 'string', example: 'Hello world!' })
+    @IsOptional()
+    @IsString()
+    described: string;
+
+    @IsOptional()
+    @IsString()
+    status: string;
 }
 
 class AddPostFilesValidator extends FileValidator {

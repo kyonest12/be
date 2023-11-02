@@ -5,6 +5,7 @@ import { ChangeProfileAfterSignupDto } from './dto/change-profile-after-signup.d
 import { Repository } from 'typeorm';
 import { AccountStatus } from '../../constants/account-status.enum';
 import { AppException } from '../../exceptions/app.exception';
+import { getFilePath } from '../../utils/get-file-path.util';
 
 @Injectable()
 export class ProfileService {
@@ -19,7 +20,7 @@ export class ProfileService {
         }
         user.username = body.username;
         if (file) {
-            user.avatar = `${process.env.APP_URL}/files/${file.filename}`;
+            user.avatar = getFilePath(file);
         }
         user.status = AccountStatus.Active;
         await this.userRepository.save(user);

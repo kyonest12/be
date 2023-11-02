@@ -17,15 +17,15 @@ export class PostController {
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(
         FileFieldsInterceptor([
-            { name: 'images', maxCount: 10 },
+            { name: 'image', maxCount: 20 },
             { name: 'video', maxCount: 1 },
         ]),
     )
     async addPost(
         @AuthUser() user: User,
         @Body() body: AddPostDto,
-        @UploadedFiles(addPostFilesValidator) { images, video },
+        @UploadedFiles(addPostFilesValidator) { image, video },
     ) {
-        return this.postService.addPost(user.id, body, images, video[0]);
+        return this.postService.addPost(user, body, image, video[0]);
     }
 }

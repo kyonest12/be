@@ -18,4 +18,5 @@ export const errorMessages = {
     1008: 'Maximum number of images',
     1009: 'Not access',
     1010: 'Action has been done previously by this user',
+    2001: 'Not enough coins',
 };
