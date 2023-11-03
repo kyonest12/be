@@ -8,7 +8,7 @@
 # Initial setup
 
 -   Copy file `.env.example` to `.env`
--   SQL server running at port 3306, with DB, username, password the same as in `.env` file. It is recommended to use docker container as db host.
+-   SQL server running at port 5432, with DB, username, password the same as in `.env` file. It is recommended to use docker container as db host.
 
 ```
 docker-compose up -d
