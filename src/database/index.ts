@@ -10,6 +10,7 @@ import { PostImage } from './entities/post-image.entity';
 import { PostVideo } from './entities/post-video.entity';
 import { Post } from './entities/post.entity';
 import { PushSettings } from './entities/push-settings.entity';
+import { Report } from './entities/report.entity';
 import { Search } from './entities/search.entity';
 import { UserInfo } from './entities/user-info.entity';
 import { User } from './entities/user.entity';
