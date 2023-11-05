@@ -17,6 +17,7 @@ export class AddPostDto {
     @IsString()
     described: string;
 
+    @ApiProperty({ required: false, type: 'string', example: 'Hyped' })
     @IsOptional()
     @IsString()
     status: string;
