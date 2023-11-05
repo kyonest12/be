@@ -37,7 +37,7 @@ import { PostService } from './modules/post/post.service';
             }),
         }),
     ],
-    controllers: [AuthController, ProfileController],
+    controllers: [AuthController, ProfileController, PostController],
     providers: [ProfileService, PostService],
 })
 export class AppModule {}
