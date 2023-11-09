@@ -6,7 +6,6 @@ import { ApiProperty } from '@nestjs/swagger';
 export class GetListFriendsDto extends GetListDto {
     @ApiProperty({
         required: false,
-        type: 'number',
         example: 0,
     })
     @IsOptional()

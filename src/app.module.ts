@@ -16,6 +16,8 @@ import { PostController } from './modules/post/post.controller';
 import { PostService } from './modules/post/post.service';
 import { FriendController } from './modules/friend/friend.controller';
 import { FriendService } from './modules/friend/friend.service';
+import { BlockController } from './modules/block/block.controller';
+import { BlockService } from './modules/block/block.service';
 
 @Module({
     imports: [
@@ -39,7 +41,7 @@ import { FriendService } from './modules/friend/friend.service';
             }),
         }),
     ],
-    controllers: [AuthController, ProfileController, PostController, FriendController],
-    providers: [ProfileService, PostService, FriendService],
+    controllers: [AuthController, ProfileController, PostController, FriendController, BlockController],
+    providers: [ProfileService, PostService, FriendService, BlockService],
 })
 export class AppModule {}
