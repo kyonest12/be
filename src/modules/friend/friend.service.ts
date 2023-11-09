@@ -19,7 +19,7 @@ export class FriendService {
         private friendRequestRepo: Repository<FriendRequest>,
     ) {}
 
-    async getRequestedFriends(user: User, { index = 0, count = 10 }: GetListDto) {
+    async getRequestedFriends(user: User, { index = 0, count = 5 }: GetListDto) {
         const [requestedFriends, total] = await this.friendRequestRepo
             .createQueryBuilder('friendRequest')
             .where({
@@ -91,7 +91,7 @@ export class FriendService {
         return {};
     }
 
-    async getUserFriends(user: User, { user_id = user.id, index, count }: GetListFriendsDto) {
+    async getUserFriends(user: User, { user_id = user.id, index = 0, count = 5 }: GetListFriendsDto) {
         const [friends, total] = await this.friendRepo
             .createQueryBuilder('friend')
             .innerJoinAndSelect('friend.friend', 'friend')
