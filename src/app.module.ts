@@ -14,6 +14,10 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { PostController } from './modules/post/post.controller';
 import { PostService } from './modules/post/post.service';
+import { FriendController } from './modules/friend/friend.controller';
+import { FriendService } from './modules/friend/friend.service';
+import { BlockController } from './modules/block/block.controller';
+import { BlockService } from './modules/block/block.service';
 
 @Module({
     imports: [
@@ -37,7 +41,7 @@ import { PostService } from './modules/post/post.service';
             }),
         }),
     ],
-    controllers: [AuthController, ProfileController, PostController],
-    providers: [ProfileService, PostService],
+    controllers: [AuthController, ProfileController, PostController, FriendController, BlockController],
+    providers: [ProfileService, PostService, FriendService, BlockService],
 })
 export class AppModule {}
