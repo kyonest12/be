@@ -9,6 +9,7 @@ import { GetListFriendsDto } from './dto/get-list-friends.dto';
 import { SetAcceptFriend } from './dto/set-accept-friend.dto';
 import { AppException } from '../../exceptions/app.exception';
 import { SetRequestFriendDto } from './dto/set-request-friend.dto';
+import { BlockService } from '../block/block.service';
 
 @Injectable()
 export class FriendService {
@@ -17,6 +18,7 @@ export class FriendService {
         private friendRepo: Repository<Friend>,
         @InjectRepository(FriendRequest)
         private friendRequestRepo: Repository<FriendRequest>,
+        private blockService: BlockService,
     ) {}
 
     async getRequestedFriends(user: User, { index = 0, count = 5 }: GetListDto) {
@@ -43,7 +45,9 @@ export class FriendService {
     }
 
     async setRequestFriend(user: User, { user_id }: SetRequestFriendDto) {
-        // kiem tra block
+        if (await this.blockService.isBlock(user.id, user_id)) {
+            throw new AppException(3001);
+        }
 
         const newRequest = new FriendRequest({
             userId: user.id,
