@@ -21,6 +21,12 @@ export class UserInfo extends BaseEntity {
     @Column({ type: 'varchar', nullable: true })
     country: string | null;
 
+    @Column({ type: 'varchar', nullable: true })
+    link: string | null;
+
+    @Column({ type: 'varchar', nullable: true })
+    description: string | null;
+
     @OneToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn()
     user: User;
