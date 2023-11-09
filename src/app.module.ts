@@ -39,7 +39,7 @@ import { FriendService } from './modules/friend/friend.service';
             }),
         }),
     ],
-    controllers: [AuthController, ProfileController, FriendController],
+    controllers: [AuthController, ProfileController, PostController, FriendController],
     providers: [ProfileService, PostService, FriendService],
 })
 export class AppModule {}
