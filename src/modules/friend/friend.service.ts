@@ -6,6 +6,9 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'src/database/entities/user.entity';
 import { GetListDto } from './dto/get-list.dto';
 import { GetListFriendsDto } from './dto/get-list-friends.dto';
+import { SetAcceptFriend } from './dto/set-accept-friend.dto';
+import { AppException } from 'src/exceptions/app.exception';
+import { SetRequestFriendDto } from './dto/request-friend.dto';
 
 @Injectable()
 export class FriendService {
@@ -16,21 +19,15 @@ export class FriendService {
         private friendRequestRepo: Repository<FriendRequest>,
     ) {}
 
-    async getRequestedFriends(target: User, body: GetListDto) {
-        /**
-         * process the token: How can we verify the token?
-         * transform the parameters "index" and "count" -> "skip" and "take"
-         * get number of same friends between two users
-         */
-
-        const { token, index, count } = body;
-
+    async getRequestedFriends(user: User, { index = 0, count = 10 }: GetListDto) {
         const [requestedFriends, total] = await this.friendRequestRepo
             .createQueryBuilder('friendRequest')
             .where({
-                targetId: target.id,
+                targetId: user.id,
             })
             .innerJoinAndSelect('friendRequest.user', 'user')
+            .skip(index)
+            .take(count)
             .getManyAndCount();
 
         const requests = requestedFriends.map((requestedFriend) => ({
@@ -42,21 +39,55 @@ export class FriendService {
         }));
 
         return {
-            data: {
-                requests,
-                total,
-            },
+            requests,
+            total,
         };
     }
 
-    async getUserFriends(user: User, body: GetListFriendsDto) {
-        const { user_id, token, index, count } = body;
+    async setRequestFriend(user: User, { user_id }: SetRequestFriendDto) {
+        // kiem tra block
 
-        /**
-         * Process "token"
-         * transform "index" and "count"
-         */
+        const newRequest = new FriendRequest({
+            userId: user.id,
+            targetId: user_id,
+        });
 
+        await this.friendRequestRepo.save(newRequest);
+
+        const requestedFriends = await this.friendRequestRepo.countBy({
+            userId: user.id,
+        });
+
+        return {
+            requested_friends: String(requestedFriends),
+        };
+    }
+
+    async setAcceptFriend(user: User, { user_id, is_accept }: SetAcceptFriend) {
+        const request = await this.friendRequestRepo.findOneBy({
+            userId: user_id,
+            targetId: user.id,
+        });
+
+        if (!request) {
+            throw new AppException(9994);
+        }
+
+        if (is_accept == '1') {
+            const newFriend = new Friend({
+                friendId: user_id,
+                userId: user.id,
+            });
+
+            await this.friendRepo.save(newFriend);
+        }
+
+        await this.friendRequestRepo.delete(request.id);
+
+        return {};
+    }
+
+    async getUserFriends(user: User, { user_id, index, count }: GetListFriendsDto) {
         if (!user_id) {
             const [friends, total] = await this.friendRepo
                 .createQueryBuilder('friend')
@@ -64,6 +95,8 @@ export class FriendService {
                     userId: user.id,
                 })
                 .innerJoinAndSelect('friend.friend', 'friend')
+                .skip(index)
+                .take(count)
                 .getManyAndCount();
 
             return {
@@ -79,26 +112,18 @@ export class FriendService {
                     userId: user_id,
                 })
                 .innerJoinAndSelect('friend.friend', 'friend')
+                .skip(index)
+                .take(count)
                 .getManyAndCount();
 
             return {
-                data: {
-                    friends,
-                    total,
-                },
+                friends,
+                total,
             };
         }
     }
 
-    async setAcceptFriend() {
-        return;
-    }
-
-    async setRequestFriend() {
-        return;
-    }
-
-    async getSuggestedFriends() {
-        return;
-    }
+    // async getSuggestedFriends() {
+    //     return;
+    // }
 }

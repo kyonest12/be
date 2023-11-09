@@ -1,14 +1,13 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class GetListDto {
-    @IsString()
-    token: string;
-
+    @IsOptional()
     @Type(() => Number)
     @IsNumber()
     index: number;
 
+    @IsOptional()
     @Type(() => Number)
     @IsNumber()
     count: number;

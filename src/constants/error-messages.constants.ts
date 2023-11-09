@@ -19,4 +19,5 @@ export const errorMessages = {
     1009: 'Not access',
     1010: 'Action has been done previously by this user',
     2001: 'Not enough coins',
+    3001: 'User has been blocked',
 };
