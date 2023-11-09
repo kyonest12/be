@@ -15,7 +15,6 @@ import { Search } from './entities/search.entity';
 import { UserInfo } from './entities/user-info.entity';
 import { User } from './entities/user.entity';
 import { VerifyCode } from './entities/verify-code.entity';
-import { Report } from './entities/report.entity';
 
 export const entities = [
     User,
