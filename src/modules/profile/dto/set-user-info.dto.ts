@@ -39,6 +39,7 @@ export const imageValidation = new ParseFilePipe({
         new MaxFileSizeValidator({ maxSize: 209715200 }),
         new FileTypeValidator({ fileType: /jpeg|png|jpg|svg/ }),
     ],
+    fileIsRequired: false,
     exceptionFactory(error) {
         return new AppException(1003, 400, error);
     },

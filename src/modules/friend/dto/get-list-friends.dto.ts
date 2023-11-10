@@ -4,10 +4,7 @@ import { IsNumber, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GetListFriendsDto extends GetListDto {
-    @ApiProperty({
-        required: false,
-        example: 0,
-    })
+    @ApiProperty({ required: false, type: 'string', example: '0' })
     @IsOptional()
     @Type(() => Number)
     @IsNumber()

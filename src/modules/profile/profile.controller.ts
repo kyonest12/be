@@ -32,7 +32,7 @@ export class ProfileController {
         return this.profileService.getUserInfo(user, body);
     }
 
-    @Post('/set_user_info')
+    // @Post('/set_user_info')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(
         FileFieldsInterceptor([

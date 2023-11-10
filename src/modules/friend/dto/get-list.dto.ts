@@ -3,19 +3,13 @@ import { Type } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
 
 export class GetListDto {
-    @ApiProperty({
-        required: false,
-        example: '0',
-    })
+    @ApiProperty({ required: false, type: 'string', example: '0' })
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
     index: number;
 
-    @ApiProperty({
-        required: false,
-        example: '5',
-    })
+    @ApiProperty({ required: false, type: 'string', example: '5' })
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
