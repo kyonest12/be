@@ -11,11 +11,7 @@ export class SettingsService {
         private devTokenRepository: Repository<DevToken>,
     ) {}
 
-    async setDevtoken(token: string, devtype: DevTokenType, devtoken: string): Promise<void> {
-        // Kiểm tra và đảm bảo rằng devtype hợp lệ (ví dụ: là một trong các giá trị trong DevTokenType)
-
-        // ... Kiểm tra và xử lý devtype ...
-
+    async setDevtoken(token: string, devtype: DevTokenType, devtoken: string) {
         const existingDevToken = await this.devTokenRepository.findOne({ where: { token } });
 
         if (existingDevToken) {

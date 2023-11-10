@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
+import { DevTokenType } from 'src/constants/dev-token-type.enum';
 
 export class SetDevtokenDto {
     @ApiProperty({
@@ -14,7 +15,7 @@ export class SetDevtokenDto {
     })
     @IsNotEmpty()
     @IsString()
-    devtype: string;
+    devtype: DevTokenType;
 
     @ApiProperty({
         example: 'deviceToken123',
