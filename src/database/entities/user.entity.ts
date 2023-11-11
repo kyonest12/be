@@ -1,5 +1,15 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+    BaseEntity,
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+    OneToMany,
+} from 'typeorm';
 import { AccountStatus } from '../../constants/account-status.enum';
+import { Block } from './block.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -33,6 +43,12 @@ export class User extends BaseEntity {
 
     @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
+
+    @OneToMany(() => Block, (block) => block.target)
+    blocked: Block[];
+
+    @OneToMany(() => Block, (block) => block.user)
+    blocking: Block[];
 
     constructor(props: Partial<User>) {
         super();

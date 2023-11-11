@@ -57,13 +57,21 @@ export class Post extends BaseEntity {
     images: PostImage[];
 
     @OneToOne(() => PostVideo, (video) => video.post, { cascade: true })
-    video: PostVideo;
+    video: PostVideo | null;
 
     @OneToMany(() => Feel, (feel) => feel.post)
     feels: Feel[];
+    feelsCount: number;
+    kudosCount: number;
+    disappointedCount: number;
+    feelOfUser: Feel;
 
     @OneToMany(() => Mark, (mark) => mark.post)
     marks: Mark[];
+    marksCount: number;
+    trustCount: number;
+    fakeCount: number;
+    markOfUser: Mark;
 
     @OneToMany(() => Report, (report) => report.post)
     reports: Report[];

@@ -64,4 +64,5 @@ class AddPostFilesValidator extends FileValidator {
 
 export const addPostFilesValidator = new ParseFilePipe({
     validators: [new AddPostFilesValidator({})],
+    fileIsRequired: false,
 });

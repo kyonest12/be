@@ -53,9 +53,7 @@ export class AuthService {
             status: AccountStatus.Inactive,
         });
         await this.userRepo.save(user);
-        await this.getVerifyCode(email);
-
-        return {};
+        return this.getVerifyCode(email);
     }
 
     async login({ email, password, uuid: device_id }: LoginDto) {
@@ -133,7 +131,9 @@ export class AuthService {
             text: `This is your verify code ${code} `,
         });
 
-        return {};
+        return {
+            verify_code: String(code),
+        };
     }
 
     async verifyCode(email: string, code: string) {

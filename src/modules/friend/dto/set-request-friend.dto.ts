@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { IsNumber } from 'class-validator';
 
 export class SetRequestFriendDto {
-    @ApiProperty({ example: '1' })
+    @ApiProperty({ type: 'string', example: '1' })
     @Type(() => Number)
     @IsNumber()
     user_id: number;
