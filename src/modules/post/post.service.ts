@@ -83,7 +83,7 @@ export class PostService {
             .leftJoinAndMapOne('post.feelOfUser', 'post.feels', 'feel_of_user', 'feel_of_user.userId = :userId', {
                 userId: user.id,
             })
-            .leftJoinAndMapOne('post.markOfUser', 'post.marks', 'mark_of_user', 'mark_of_user.posterId = :userId', {
+            .leftJoinAndMapOne('post.markOfUser', 'post.marks', 'mark_of_user', 'mark_of_user.userId = :userId', {
                 userId: user.id,
             })
             .leftJoinAndSelect('author.blocked', 'blocked', 'blocked.userId = :userId', {
