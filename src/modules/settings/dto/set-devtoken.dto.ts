@@ -4,13 +4,6 @@ import { DevTokenType } from 'src/constants/dev-token-type.enum';
 
 export class SetDevtokenDto {
     @ApiProperty({
-        example: '1234567890',
-    })
-    @IsNotEmpty()
-    @IsString()
-    token: string;
-
-    @ApiProperty({
         example: '1',
     })
     @IsNotEmpty()

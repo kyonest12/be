@@ -1,6 +1,8 @@
 import { Controller, Post, HttpCode, Body } from '@nestjs/common';
 import { ApiTags, ApiBody } from '@nestjs/swagger';
 import { Auth } from '../../auth/decorators/auth.decorator';
+import { AuthUser } from '../../auth/decorators/user.decorator';
+import { User } from '../../database/entities/user.entity';
 import { SettingsService } from './settings.service';
 import { SetDevtokenDto } from './dto/set-devtoken.dto';
 
@@ -10,11 +12,11 @@ import { SetDevtokenDto } from './dto/set-devtoken.dto';
 export class SettingsController {
     constructor(private readonly settingsService: SettingsService) {}
 
-    @Post('set_devtoken')
+    @Post('/set_devtoken')
     @HttpCode(200)
     @ApiBody({ type: SetDevtokenDto })
-    async setDevToken(@Body() setDevtokenDto: SetDevtokenDto) {
-        const { token, devtype, devtoken } = setDevtokenDto;
-        return this.settingsService.setDevtoken(token, devtype, devtoken);
+    async setDevToken(@AuthUser() user: User, @Body() setDevtokenDto: SetDevtokenDto) {
+        const { devtype, devtoken } = setDevtokenDto;
+        return this.settingsService.setDevtoken(user, devtype, devtoken);
     }
 }
