@@ -1,19 +1,40 @@
 import { FileTypeValidator, MaxFileSizeValidator, ParseFilePipe } from '@nestjs/common';
-import { Allow, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { Allow, IsOptional, IsString } from 'class-validator';
 import { AppException } from '../../../exceptions/app.exception';
 
-export class ChangeProfileAfterSignupDto {
-    @ApiProperty({ example: 'example' })
+export class SetUserInfoDto {
+    @IsOptional()
     @IsString()
     username: string;
 
-    @ApiProperty({ type: 'file', required: false })
+    @IsOptional()
+    @IsString()
+    description: string;
+
     @Allow()
     avatar: any;
+
+    @IsOptional()
+    @IsString()
+    address: string;
+
+    @IsOptional()
+    @IsString()
+    city: string;
+
+    @IsOptional()
+    @IsString()
+    country: string;
+
+    @Allow()
+    cover_image: any;
+
+    @IsOptional()
+    @IsString()
+    link: string;
 }
 
-export const avatarValidation = new ParseFilePipe({
+export const imageValidation = new ParseFilePipe({
     validators: [
         new MaxFileSizeValidator({ maxSize: 209715200 }),
         new FileTypeValidator({ fileType: /jpeg|png|jpg|svg/ }),

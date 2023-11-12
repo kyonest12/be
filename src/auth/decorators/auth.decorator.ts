@@ -10,7 +10,7 @@ export function Auth() {
             content: {
                 json: {
                     example: {
-                        code: 9998,
+                        code: '9998',
                         message: 'Token is invalid',
                     },
                 },
