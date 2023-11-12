@@ -50,7 +50,7 @@ export class AuthService {
         const user = new User({
             email,
             password: await this.hashPassword(password),
-            status: AccountStatus.Inactive,
+            status: AccountStatus.Pending,
         });
         await this.userRepo.save(user);
         return this.getVerifyCode(email);
