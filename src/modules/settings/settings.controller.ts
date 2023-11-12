@@ -15,8 +15,7 @@ export class SettingsController {
     @Post('/set_devtoken')
     @HttpCode(200)
     @ApiBody({ type: SetDevtokenDto })
-    async setDevToken(@AuthUser() user: User, @Body() setDevtokenDto: SetDevtokenDto) {
-        const { devtype, devtoken } = setDevtokenDto;
-        return this.settingsService.setDevtoken(user, devtype, devtoken);
+    async setDevToken(@AuthUser() user: User, @Body() body: SetDevtokenDto) {
+        return this.settingsService.setDevtoken(user, body);
     }
 }
