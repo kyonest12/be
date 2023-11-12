@@ -7,6 +7,7 @@ import { AuthUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../database/entities/user.entity';
 import { PostService } from './post.service';
 import { GetPostDto } from './dto/get-post.dto';
+import { GetListPostsDto } from './dto/get-list-posts.dto';
 
 @Controller()
 @ApiTags('Post')
@@ -35,5 +36,11 @@ export class PostController {
     @HttpCode(200)
     async getPost(@AuthUser() user: User, @Body() body: GetPostDto) {
         return this.postService.getPost(user, body);
+    }
+
+    @Post('get_list_posts')
+    @HttpCode(200)
+    async getListPosts(@AuthUser() user: User, @Body() body: GetListPostsDto) {
+        return this.postService.getListPosts(user, body);
     }
 }

@@ -69,6 +69,7 @@ export class Post extends BaseEntity {
     @OneToMany(() => Mark, (mark) => mark.post)
     marks: Mark[];
     marksCount: number;
+    commentsCount: number;
     trustCount: number;
     fakeCount: number;
     markOfUser: Mark;
