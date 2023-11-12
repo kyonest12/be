@@ -19,10 +19,10 @@ export class DevToken extends BaseEntity {
     userId: number;
 
     @Column({ type: 'int2' })
-    devtype: DevTokenType;
+    type: DevTokenType;
 
     @Column({ type: 'varchar' })
-    devtoken: string;
+    token: string;
 
     @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;

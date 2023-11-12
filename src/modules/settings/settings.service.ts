@@ -13,19 +13,21 @@ export class SettingsService {
     ) {}
 
     async setDevtoken(user: User, devtype: DevTokenType, devtoken: string) {
-        const existingDevToken = await this.devTokenRepository.findOne({ where: { devtoken, userId: user.id } });
+        const existingDevToken = await this.devTokenRepository.findOne({ where: { token: devtoken, userId: user.id } });
 
         if (existingDevToken) {
-            existingDevToken.devtype = devtype;
-            existingDevToken.devtoken = devtoken;
+            existingDevToken.type = devtype;
+            existingDevToken.token = devtoken;
             await this.devTokenRepository.save(existingDevToken);
         } else {
             const newDevToken = new DevToken({
                 userId: user.id,
-                devtype: devtype,
-                devtoken: devtoken,
+                type: devtype,
+                token: devtoken,
             });
             await this.devTokenRepository.save(newDevToken);
         }
+
+        return {};
     }
 }
