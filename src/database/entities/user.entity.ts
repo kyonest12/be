@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { AccountStatus } from '../../constants/account-status.enum';
 import { Block } from './block.entity';
+import { Friend } from './friend.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -49,6 +50,10 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Block, (block) => block.user)
     blocking: Block[];
+
+    @OneToMany(() => Friend, (friend) => friend.user)
+    friends: Friend[];
+    friendsCount: number;
 
     constructor(props: Partial<User>) {
         super();
