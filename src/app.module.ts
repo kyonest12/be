@@ -18,6 +18,8 @@ import { FriendController } from './modules/friend/friend.controller';
 import { FriendService } from './modules/friend/friend.service';
 import { BlockController } from './modules/block/block.controller';
 import { BlockService } from './modules/block/block.service';
+import { SettingsController } from './modules/settings/settings.controller';
+import { SettingsService } from './modules/settings/settings.service';
 
 @Module({
     imports: [
@@ -41,7 +43,14 @@ import { BlockService } from './modules/block/block.service';
             }),
         }),
     ],
-    controllers: [AuthController, ProfileController, PostController, FriendController, BlockController],
-    providers: [ProfileService, PostService, FriendService, BlockService],
+    controllers: [
+        AuthController,
+        ProfileController,
+        PostController,
+        FriendController,
+        BlockController,
+        SettingsController,
+    ],
+    providers: [ProfileService, PostService, FriendService, BlockService, SettingsService],
 })
 export class AppModule {}
