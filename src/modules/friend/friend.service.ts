@@ -33,13 +33,16 @@ export class FriendService {
             .getManyAndCount();
 
         return {
-            requests: requestedFriends.map((requestedFriend) => ({
-                id: String(requestedFriend.user.id),
-                username: requestedFriend.user.username || '',
-                avatar: requestedFriend.user.avatar || '',
-                // same_friends
-                created: requestedFriend.createdAt,
-            })),
+            requests: requestedFriends.map(async (requestedFriend) => {
+                const numOfSameFriends = await this.countSameFriends(user.id, requestedFriend.user.id);
+                return {
+                    id: String(requestedFriend.user.id),
+                    username: requestedFriend.user.username || '',
+                    avatar: requestedFriend.user.avatar || '',
+                    same_friends: String(numOfSameFriends),
+                    created: requestedFriend.createdAt,
+                };
+            }),
             total: String(total),
         };
     }
@@ -105,13 +108,16 @@ export class FriendService {
             .getManyAndCount();
 
         return {
-            friends: friends.map((friend) => ({
-                id: String(friend.friend.id),
-                username: friend.friend.username || '',
-                avatar: friend.friend.avatar || '',
-                // same_friends
-                created: friend.friend.createdAt,
-            })),
+            friends: friends.map(async (friend) => {
+                const numOfSameFriends = await this.countSameFriends(user.id, friend.user.id);
+                return {
+                    id: String(friend.friend.id),
+                    username: friend.friend.username || '',
+                    avatar: friend.friend.avatar || '',
+                    same_friends: String(numOfSameFriends),
+                    created: friend.friend.createdAt,
+                };
+            }),
             total: String(total),
         };
     }
@@ -119,4 +125,26 @@ export class FriendService {
     // async getSuggestedFriends() {
     //     return;
     // }
+
+    async countSameFriends(userId: number, targetId: number) {
+        const friendOfUser = await this.friendRepo.findBy({
+            userId,
+        });
+
+        const friendOfTarget = await this.friendRepo.findBy({
+            userId: targetId,
+        });
+
+        let count = 0;
+
+        friendOfTarget.forEach((targetRecord) => {
+            if (targetRecord.friendId != userId) {
+                friendOfUser.forEach((userRecord) => {
+                    if (targetRecord.friendId == userRecord.friendId) count += 1;
+                });
+            }
+        });
+
+        return count;
+    }
 }
