@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class UpdateTableUserInfoDescriptionLink1699547944318 implements MigrationInterface {
-    name = 'UpdateTableUserInfoDescriptionLink1699547944318'
+    name = 'UpdateTableUserInfoDescriptionLink1699547944318';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -22,5 +22,4 @@ export class UpdateTableUserInfoDescriptionLink1699547944318 implements Migratio
             ALTER TABLE "user_info" DROP COLUMN "link"
         `);
     }
-
 }

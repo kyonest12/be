@@ -8,6 +8,7 @@ import { User } from '../../database/entities/user.entity';
 import { PostService } from './post.service';
 import { GetPostDto } from './dto/get-post.dto';
 import { GetListPostsDto } from './dto/get-list-posts.dto';
+import { EditPostDto } from './dto/edit-post.dto';
 
 @Controller()
 @ApiTags('Post')
@@ -42,5 +43,22 @@ export class PostController {
     @HttpCode(200)
     async getListPosts(@AuthUser() user: User, @Body() body: GetListPostsDto) {
         return this.postService.getListPosts(user, body);
+    }
+
+    @Post('edit_post')
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(
+        FileFieldsInterceptor([
+            { name: 'image', maxCount: 20 },
+            { name: 'video', maxCount: 1 },
+        ]),
+    )
+    @HttpCode(200)
+    async editPost(
+        @AuthUser() user: User,
+        @Body() body: EditPostDto,
+        @UploadedFiles(addPostFilesValidator) { image, video },
+    ) {
+        return this.postService.editPost(user, body, image, video?.[0]);
     }
 }
