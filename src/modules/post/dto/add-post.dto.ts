@@ -15,12 +15,16 @@ export class AddPostDto {
     @ApiProperty({ required: false, type: 'string', example: 'Hello world!' })
     @IsOptional()
     @IsString()
-    described: string;
+    described?: string;
 
     @ApiProperty({ required: false, type: 'string', example: 'Hyped' })
     @IsOptional()
     @IsString()
-    status: string;
+    status?: string;
+
+    @ApiProperty({ required: false, type: 'string', example: '1' })
+    @Allow()
+    auto_accept?: any;
 }
 
 class AddPostFilesValidator extends FileValidator {

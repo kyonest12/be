@@ -17,6 +17,7 @@ import { PostVideo } from './post-video.entity';
 import { Mark } from './mark.entity';
 import { Feel } from './feel.entity';
 import { Report } from './report.entity';
+import { PostHistory } from './post-history.entity';
 
 @Entity('posts')
 export class Post extends BaseEntity {
@@ -66,7 +67,7 @@ export class Post extends BaseEntity {
     disappointedCount: number;
     feelOfUser: Feel;
 
-    @OneToMany(() => Mark, (mark) => mark.post)
+    @OneToMany(() => Mark, (mark) => mark.post, { cascade: true })
     marks: Mark[];
     marksCount: number;
     commentsCount: number;
@@ -76,6 +77,9 @@ export class Post extends BaseEntity {
 
     @OneToMany(() => Report, (report) => report.post)
     reports: Report[];
+
+    @OneToMany(() => PostHistory, (history) => history.post, { cascade: true })
+    histories: PostHistory[];
 
     constructor(props: Partial<Post>) {
         super();

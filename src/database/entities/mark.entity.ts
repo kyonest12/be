@@ -27,6 +27,9 @@ export class Mark extends BaseEntity {
     @Column({ type: 'int2' }) // MarkType enum
     type: MarkType;
 
+    @Column({ type: 'bool', default: false })
+    editable: boolean;
+
     @Column({ type: 'int' })
     userId: number;
 
