@@ -51,6 +51,7 @@ export class AuthService {
             email,
             password: await this.hashPassword(password),
             status: AccountStatus.Inactive,
+            coins: 50,
         });
         await this.userRepo.save(user);
         return this.getVerifyCode(email);
