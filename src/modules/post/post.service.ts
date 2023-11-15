@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AddPostDto } from './dto/add-post.dto';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Post } from '../../database/entities/post.entity';
-import { MoreThan, Repository } from 'typeorm';
+import { DataSource, MoreThan, Repository } from 'typeorm';
 import { PostVideo } from '../../database/entities/post-video.entity';
 import { getFilePath } from '../../utils/get-file-path.util';
 import { PostImage } from '../../database/entities/post-image.entity';
@@ -22,6 +22,9 @@ import {
 } from '../../utils/get-post-subdata.util';
 import { GetListPostsDto } from './dto/get-list-posts.dto';
 import { Comment } from '../../database/entities/comment.entity';
+import { EditPostDto } from './dto/edit-post.dto';
+import dayjs from 'dayjs';
+import { PostHistory } from '../../database/entities/post-history.entity';
 
 @Injectable()
 export class PostService {
@@ -30,48 +33,58 @@ export class PostService {
         private userRepo: Repository<User>,
         @InjectRepository(Post)
         private postRepo: Repository<Post>,
+        @InjectRepository(PostHistory)
+        private postHistoryRepo: Repository<PostHistory>,
         @InjectRepository(Comment)
         private commentRepo: Repository<Comment>,
+        @InjectDataSource()
+        private dataSource: DataSource,
     ) {}
 
     async addPost(user: User, body: AddPostDto, images?: Array<Express.Multer.File>, video?: Express.Multer.File) {
-        if (user.coins < 10) {
-            throw new AppException(2001);
-        }
+        return this.dataSource.transaction(async (manager) => {
+            const userRepo = manager.getRepository(User);
+            const postRepo = manager.getRepository(Post);
+            if (user.coins < 10) {
+                throw new AppException(2001);
+            }
 
-        const post = new Post({
-            authorId: user.id,
-            description: body.described,
-            status: body.status,
-            images: [],
-        });
-        if (video) {
-            post.video = new PostVideo({ url: getFilePath(video) });
-        } else if (images?.length) {
-            post.images = images.map((image, i) => {
-                return new PostImage({
-                    url: getFilePath(image),
-                    order: i + 1,
-                });
+            const post = new Post({
+                authorId: user.id,
+                description: body.described,
+                status: body.status,
+                images: [],
             });
-        }
-        user.coins -= costs.createPost;
+            if (video) {
+                post.video = new PostVideo({ url: getFilePath(video) });
+            } else if (images?.length) {
+                post.images = images.map((image, i) => {
+                    return new PostImage({
+                        url: getFilePath(image),
+                        order: i + 1,
+                    });
+                });
+            }
+            user.coins -= costs.createPost;
 
-        await this.userRepo.save(user);
-        await this.postRepo.save(post);
+            await userRepo.save(user);
+            await postRepo.save(post);
 
-        return {
-            id: String(post.id),
-            coins: String(user.coins),
-        };
+            return {
+                id: String(post.id),
+                coins: String(user.coins),
+            };
+        });
     }
 
     async getPost(user: User, { id }: GetPostDto) {
         const post = await this.postRepo
             .createQueryBuilder('post')
+            .withDeleted()
             .innerJoinAndSelect('post.author', 'author')
             .leftJoinAndSelect('post.images', 'image')
             .leftJoinAndSelect('post.video', 'video')
+            .leftJoinAndSelect('post.histories', 'history')
             .loadRelationCountAndMap('post.kudosCount', 'post.feels', 'feel_kudos', (qb) =>
                 qb.where({ type: FeelType.Kudos }),
             )
@@ -97,6 +110,10 @@ export class PostService {
                 userId: user.id,
             })
             .where({ id })
+            .orderBy({
+                'image.order': 'ASC',
+                'history.id': 'DESC',
+            })
             .getOne();
 
         if (!post) {
@@ -130,7 +147,7 @@ export class PostService {
                     name: post.author.username || '',
                     avatar: post.author.avatar || '',
                     coins: String(post.author.coins),
-                    listing: '', // TODO: edit versioning
+                    listing: post.histories.map((e) => String(e.oldPostId)),
                 },
                 category: getCategory(post),
                 state: post.status || '',
@@ -141,6 +158,7 @@ export class PostService {
                 can_rate: getCanRate(post, user),
                 url: '',
                 messages: '',
+                deleted: post.deletedAt ? post.deletedAt : undefined,
             };
         }
     }
@@ -162,7 +180,10 @@ export class PostService {
             .leftJoinAndSelect('author.blocking', 'blocking', 'blocking.targetId = :userId', {
                 userId: user.id,
             })
-            .orderBy({ 'post.id': 'ASC' })
+            .orderBy({
+                'post.id': 'ASC',
+                'image.order': 'ASC',
+            })
             .skip(index)
             .take(count);
 
@@ -226,5 +247,111 @@ export class PostService {
             new_items: String(newItems),
             last_id: String(lastId),
         };
+    }
+
+    async editPost(
+        user: User,
+        { id, described, status, image_sort, image_del }: EditPostDto,
+        images: Express.Multer.File[] = [],
+        video?: Express.Multer.File,
+    ) {
+        return this.dataSource.transaction(async (manager) => {
+            const userRepo = manager.getRepository(User);
+            const postRepo = manager.getRepository(Post);
+            const postHistoryRepo = manager.getRepository(PostHistory);
+
+            const post = await postRepo
+                .createQueryBuilder('post')
+                .leftJoinAndSelect('post.images', 'image')
+                .leftJoinAndSelect('post.video', 'video')
+                .leftJoinAndSelect('post.marks', 'mark')
+                .leftJoinAndSelect('mark.comments', 'comment')
+                .where({
+                    id,
+                    authorId: user.id,
+                })
+                .getOne();
+
+            if (!post) {
+                throw new AppException(9994, 404);
+            }
+
+            let newPost: Post;
+            if (dayjs(post.createdAt).add(1, 'day').isAfter(dayjs())) {
+                newPost = post;
+            } else {
+                newPost = new Post({
+                    authorId: post.authorId,
+                    description: post.description,
+                    status: post.status,
+                    images: post.images.map(
+                        (image) =>
+                            new PostImage({
+                                url: image.url,
+                                order: image.order,
+                            }),
+                    ),
+                    video:
+                        post.video &&
+                        new PostVideo({
+                            url: post.video.url,
+                        }),
+                    edited: post.edited,
+                    marks: post.marks,
+                });
+            }
+
+            const mapImages = Object.fromEntries(newPost.images.map((e) => [e.order, e]));
+
+            if (image_sort) {
+                newPost.images = [];
+                for (const order of image_sort) {
+                    if (mapImages[order]) {
+                        newPost.images.push(mapImages[order]);
+                    }
+                }
+            }
+            if (image_del) {
+                const deleted = Object.fromEntries(image_del.map((e) => [e, true]));
+                newPost.images = newPost.images.filter((image) => !deleted[image.order]);
+            }
+            for (const image of images) {
+                newPost.images.push(new PostImage({ url: getFilePath(image) }));
+            }
+            if (described) {
+                newPost.description = described;
+            }
+            if (status) {
+                newPost.status = status;
+            }
+            if (video) {
+                newPost.video = new PostVideo({ url: getFilePath(video) });
+                newPost.images = [];
+            }
+            for (let i = 0; i < newPost.images.length; i++) {
+                newPost.images[i].order = i + 1;
+            }
+            for (const mark of newPost.marks) {
+                mark.editable = true;
+            }
+
+            if (post !== newPost) {
+                newPost.edited++;
+                await postRepo.save(newPost);
+                await postHistoryRepo.update({ postId: post.id }, { postId: newPost.id });
+                await postHistoryRepo.save(new PostHistory({ postId: newPost.id, oldPostId: post.id }));
+                await postRepo.softDelete(post.id);
+
+                user.coins -= costs.createPost;
+                await userRepo.save(user);
+            } else {
+                await postRepo.save(newPost);
+            }
+
+            return {
+                id: String(newPost.id),
+                coins: String(user.coins),
+            };
+        });
     }
 }

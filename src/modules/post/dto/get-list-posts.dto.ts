@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Allow, IsNumber, IsOptional } from 'class-validator';
+import { Allow, IsInt, IsOptional } from 'class-validator';
 
 export class GetListPostsDto {
     @ApiProperty({ required: false, type: 'string', example: '1' })
@@ -25,17 +25,17 @@ export class GetListPostsDto {
 
     @ApiProperty({ required: false, type: 'string', example: '6' })
     @Type(() => Number)
-    @IsNumber()
+    @IsInt()
     last_id: number;
 
     @ApiProperty({ type: 'string', example: '0' })
     @IsOptional()
     @Type(() => Number)
-    @IsNumber()
+    @IsInt()
     index: number;
 
     @ApiProperty({ type: 'string', example: '10' })
     @Type(() => Number)
-    @IsNumber()
+    @IsInt()
     count: number;
 }
