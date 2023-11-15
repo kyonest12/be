@@ -20,4 +20,7 @@ export const errorMessages = {
     1010: 'Action has been done previously by this user',
     2001: 'Not enough coins',
     3001: 'User has been blocked',
+    4001: "User hasn't set info yet",
+    4002: 'Can not send request to yourself',
+    4003: 'Request friend duplicated',
 };
