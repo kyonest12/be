@@ -26,14 +26,12 @@ export class FriendService {
     async getRequestedFriends(user: User, { index = 0, count = 5 }: GetListDto) {
         const [requestedFriends, total] = await this.friendRequestRepo
             .createQueryBuilder('request')
-            .where({
-                targetId: user.id,
-            })
+            .where({ targetId: user.id })
             .innerJoinAndSelect('request.user', 'user')
             .loadRelationCountAndMap('user.friendsCount', 'user.friends', 'friend', (qb) =>
                 qb.where({ friendId: user.id }),
             )
-            .orderBy('user.id', 'ASC')
+            .orderBy({ 'request.id': 'DESC' })
             .skip(index)
             .take(count)
             .getManyAndCount();
@@ -124,7 +122,7 @@ export class FriendService {
                 qb.where({ friendId: user.id }),
             )
             .where({ userId: user_id })
-            .orderBy('friend.id', 'ASC')
+            .orderBy({ 'friend.id': 'DESC' })
             .skip(index)
             .take(count)
             .getManyAndCount();
@@ -143,13 +141,11 @@ export class FriendService {
         };
     }
 
-    // TO DO
+    // TODO
     async getSuggestedFriends(user: User, { index = 0, count = 5 }: GetListDto) {
         const remainUsers = await this.userRepo
             .createQueryBuilder('user')
-            .where({
-                id: Not(user.id),
-            })
+            .where({ id: Not(user.id) })
             .loadRelationCountAndMap('user.friendsCount', 'user.friends', 'friend', (qb) =>
                 qb.where({ friendId: user.id }),
             )
