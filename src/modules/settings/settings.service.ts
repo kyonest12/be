@@ -34,9 +34,8 @@ export class SettingsService {
         return {};
     }
 
-    async buyCoins(user: User, body: BuyCoinsDto) {
-        const coinsToAdd = body.coins;
-        user.coins += coinsToAdd;
+    async buyCoins(user: User, { coins }: BuyCoinsDto) {
+        user.coins += coins;
 
         await this.userRepo.save(user);
 
