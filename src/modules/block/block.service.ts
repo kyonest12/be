@@ -20,6 +20,7 @@ export class BlockService {
             .where({
                 userId: user.id,
             })
+            .orderBy('target.id', 'ASC')
             .skip(index)
             .take(count)
             .getMany();

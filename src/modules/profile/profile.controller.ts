@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
+import { Controller, Post, HttpCode, UploadedFiles, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AuthUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../database/entities/user.entity';
@@ -43,7 +43,7 @@ export class ProfileController {
     async setUserInfo(
         @AuthUser() user: User,
         @Body() body: SetUserInfoDto,
-        @UploadedFile(userInfoValidation) { avatar, cover_image },
+        @UploadedFiles(userInfoValidation) { avatar, cover_image },
     ) {
         return this.profileService.setUserInfo(user, body, avatar, cover_image);
     }

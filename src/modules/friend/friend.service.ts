@@ -33,6 +33,7 @@ export class FriendService {
             .loadRelationCountAndMap('user.friendsCount', 'user.friends', 'friend', (qb) =>
                 qb.where({ friendId: user.id }),
             )
+            .orderBy('user.friendsCount', 'DESC')
             .skip(index)
             .take(count)
             .getManyAndCount();
@@ -123,6 +124,7 @@ export class FriendService {
                 qb.where({ friendId: user.id }),
             )
             .where({ userId: user_id })
+            .orderBy('friend.id', 'ASC')
             .skip(index)
             .take(count)
             .getManyAndCount();
