@@ -33,7 +33,7 @@ export class FriendService {
             .loadRelationCountAndMap('user.friendsCount', 'user.friends', 'friend', (qb) =>
                 qb.where({ friendId: user.id }),
             )
-            .orderBy('user.friendsCount', 'DESC')
+            .orderBy('user.id', 'ASC')
             .skip(index)
             .take(count)
             .getManyAndCount();
@@ -143,6 +143,7 @@ export class FriendService {
         };
     }
 
+    // TO DO
     async getSuggestedFriends(user: User, { index = 0, count = 5 }: GetListDto) {
         const remainUsers = await this.userRepo
             .createQueryBuilder('user')
