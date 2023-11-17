@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 import { Friend } from '../../database/entities/friend.entity';
 import { FriendRequest } from '../../database/entities/friend-request.entity';
 import { Injectable } from '@nestjs/common';
@@ -18,28 +18,34 @@ export class FriendService {
         private friendRepo: Repository<Friend>,
         @InjectRepository(FriendRequest)
         private friendRequestRepo: Repository<FriendRequest>,
+        @InjectRepository(User)
+        private userRepo: Repository<User>,
         private blockService: BlockService,
     ) {}
 
     async getRequestedFriends(user: User, { index = 0, count = 5 }: GetListDto) {
         const [requestedFriends, total] = await this.friendRequestRepo
-            .createQueryBuilder('friendRequest')
-            .where({
-                targetId: user.id,
-            })
-            .innerJoinAndSelect('friendRequest.user', 'user')
+            .createQueryBuilder('request')
+            .where({ targetId: user.id })
+            .innerJoinAndSelect('request.user', 'user')
+            .loadRelationCountAndMap('user.friendsCount', 'user.friends', 'friend', (qb) =>
+                qb.where({ friendId: user.id }),
+            )
+            .orderBy({ 'request.id': 'DESC' })
             .skip(index)
             .take(count)
             .getManyAndCount();
 
         return {
-            requests: requestedFriends.map((requestedFriend) => ({
-                id: String(requestedFriend.user.id),
-                username: requestedFriend.user.username || '',
-                avatar: requestedFriend.user.avatar || '',
-                // same_friends
-                created: requestedFriend.createdAt,
-            })),
+            requests: requestedFriends.map((requestedFriend) => {
+                return {
+                    id: String(requestedFriend.user.id),
+                    username: requestedFriend.user.username || '',
+                    avatar: requestedFriend.user.avatar || '',
+                    same_friends: String(requestedFriend.user.friendsCount),
+                    created: requestedFriend.createdAt,
+                };
+            }),
             total: String(total),
         };
     }
@@ -47,6 +53,19 @@ export class FriendService {
     async setRequestFriend(user: User, { user_id }: SetRequestFriendDto) {
         if (await this.blockService.isBlock(user.id, user_id)) {
             throw new AppException(3001);
+        }
+
+        if (user_id === user.id) {
+            throw new AppException(4002);
+        }
+
+        const existedRequest = await this.friendRequestRepo.findOneBy({
+            userId: user.id,
+            targetId: user_id,
+        });
+
+        if (existedRequest) {
+            throw new AppException(4003);
         }
 
         const newRequest = new FriendRequest({
@@ -97,26 +116,48 @@ export class FriendService {
 
     async getUserFriends(user: User, { user_id = user.id, index = 0, count = 5 }: GetListFriendsDto) {
         const [friends, total] = await this.friendRepo
-            .createQueryBuilder('friend')
-            .innerJoinAndSelect('friend.friend', 'friend')
+            .createQueryBuilder('user')
+            .innerJoinAndSelect('user.friend', 'friend')
+            .loadRelationCountAndMap('friend.friendsCount', 'friend.friends', 'same_friend', (qb) =>
+                qb.where({ friendId: user.id }),
+            )
             .where({ userId: user_id })
+            .orderBy({ 'friend.id': 'DESC' })
             .skip(index)
             .take(count)
             .getManyAndCount();
 
         return {
-            friends: friends.map((friend) => ({
-                id: String(friend.friend.id),
-                username: friend.friend.username || '',
-                avatar: friend.friend.avatar || '',
-                // same_friends
-                created: friend.friend.createdAt,
-            })),
+            friends: friends.map((friend) => {
+                return {
+                    id: String(friend.friend.id),
+                    username: friend.friend.username || '',
+                    avatar: friend.friend.avatar || '',
+                    same_friends: String(String(friend.friend.friendsCount)),
+                    created: friend.friend.createdAt,
+                };
+            }),
             total: String(total),
         };
     }
 
-    // async getSuggestedFriends() {
-    //     return;
-    // }
+    // TODO
+    async getSuggestedFriends(user: User, { index = 0, count = 5 }: GetListDto) {
+        const remainUsers = await this.userRepo
+            .createQueryBuilder('user')
+            .where({ id: Not(user.id) })
+            .loadRelationCountAndMap('user.friendsCount', 'user.friends', 'friend', (qb) =>
+                qb.where({ friendId: user.id }),
+            )
+            .skip(index)
+            .take(count)
+            .getMany();
+
+        // const formatUsers = remainUsers.map((user) => ({
+        //     user_id: String(user.id),
+        //     username: user.username || '',
+        //     avatar: user.avatar || '',
+        //     same_friends: String(user.friendsCount),
+        // }));
+    }
 }
