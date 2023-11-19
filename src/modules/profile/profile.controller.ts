@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
+import { Controller, Post, HttpCode, UploadedFiles, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AuthUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../database/entities/user.entity';
@@ -7,7 +7,7 @@ import { ChangeProfileAfterSignupDto, avatarValidation } from './dto/change-prof
 import { ProfileService } from './profile.service';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { GetUserInfoDto } from './dto/get-user-info.dto';
-import { SetUserInfoDto, imageValidation } from './dto/set-user-info.dto';
+import { SetUserInfoDto, userInfoValidation } from './dto/set-user-info.dto';
 
 @Controller()
 @ApiTags('Profile')
@@ -32,7 +32,7 @@ export class ProfileController {
         return this.profileService.getUserInfo(user, body);
     }
 
-    // @Post('/set_user_info')
+    @Post('/set_user_info')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(
         FileFieldsInterceptor([
@@ -43,7 +43,7 @@ export class ProfileController {
     async setUserInfo(
         @AuthUser() user: User,
         @Body() body: SetUserInfoDto,
-        @UploadedFile(imageValidation) { avatar, cover_image },
+        @UploadedFiles(userInfoValidation) { avatar, cover_image },
     ) {
         return this.profileService.setUserInfo(user, body, avatar, cover_image);
     }

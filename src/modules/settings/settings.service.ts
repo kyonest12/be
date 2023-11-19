@@ -4,12 +4,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DevToken } from 'src/database/entities/dev-token.entity';
 import { User } from '../../database/entities/user.entity';
 import { SetDevtokenDto } from './dto/set-devtoken.dto';
+import { BuyCoinsDto } from './dto/buy_coins.dto';
 
 @Injectable()
 export class SettingsService {
     constructor(
         @InjectRepository(DevToken)
         private devTokenRepo: Repository<DevToken>,
+        @InjectRepository(User)
+        private userRepo: Repository<User>,
     ) {}
 
     async setDevtoken(user: User, body: SetDevtokenDto) {
@@ -29,5 +32,13 @@ export class SettingsService {
         }
 
         return {};
+    }
+
+    async buyCoins(user: User, { coins }: BuyCoinsDto) {
+        user.coins += coins;
+
+        await this.userRepo.save(user);
+
+        return { coins: user.coins };
     }
 }
