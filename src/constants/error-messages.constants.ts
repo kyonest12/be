@@ -7,6 +7,8 @@ export const errorMessages = {
     9994: 'No data of end of list data',
     9993: 'Code verify is not correct',
     9992: 'Post does not exist',
+    9991: 'Email or password is not correct',
+    9990: 'Password is not correct',
     1005: 'Unknown error',
     1000: 'OK',
     1001: 'Can not connect to DB',
