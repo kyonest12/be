@@ -9,6 +9,9 @@ import { PostService } from './post.service';
 import { GetPostDto } from './dto/get-post.dto';
 import { GetListPostsDto } from './dto/get-list-posts.dto';
 import { EditPostDto } from './dto/edit-post.dto';
+import { GetListVideosDto } from './dto/get-list-videos.dto';
+import { DeletePostDto } from './dto/delete-post.dto';
+import { ReportPostDto } from './dto/report-post.dto';
 
 @Controller()
 @ApiTags('Post')
@@ -60,5 +63,23 @@ export class PostController {
         @UploadedFiles(addPostFilesValidator) { image, video },
     ) {
         return this.postService.editPost(user, body, image, video?.[0]);
+    }
+
+    @Post('get_list_videos')
+    @HttpCode(200)
+    async getListVideos(@AuthUser() user: User, @Body() body: GetListVideosDto) {
+        return this.postService.getListVideos(user, body);
+    }
+
+    @Post('delete_post')
+    @HttpCode(200)
+    async deletePost(@AuthUser() user: User, @Body() body: DeletePostDto) {
+        return this.postService.deletePost(user, body);
+    }
+
+    @Post('report_post')
+    @HttpCode(200)
+    async reportPost(@AuthUser() user: User, @Body() body: ReportPostDto) {
+        return this.postService.reportPost(user, body);
     }
 }

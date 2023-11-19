@@ -17,9 +17,8 @@ export class BlockService {
         const blocks = await this.blockRepo
             .createQueryBuilder('block')
             .innerJoinAndSelect('block.target', 'target')
-            .where({
-                userId: user.id,
-            })
+            .where({ userId: user.id })
+            .orderBy({ 'block.id': 'ASC' })
             .skip(index)
             .take(count)
             .getMany();
