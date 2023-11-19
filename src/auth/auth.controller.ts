@@ -4,12 +4,12 @@ import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { User } from '../database/entities/user.entity';
 import { ApiTags } from '@nestjs/swagger';
-import { SchemaResponse } from '../utils/example-response.decorator';
 import { GetVerifyCodeDto } from './dto/get-verify-code.dto';
 import { CheckVerifyCodeDto } from './dto/check-verify-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthUser } from './decorators/user.decorator';
 import { Auth } from './decorators/auth.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('/')
 @ApiTags('Auth')
@@ -27,14 +27,22 @@ export class AuthController {
         return this.authService.login(body);
     }
 
+    @Post('/change_password')
+    @HttpCode(200)
+    @Auth()
+    async changePassword(@AuthUser() user: User, @Body() body: ChangePasswordDto) {
+        return this.authService.changePassword(user, body);
+    }
+
     @Post('/logout')
+    @HttpCode(200)
     @Auth()
     async logout(@AuthUser() user: User) {
         return this.authService.logout(user);
     }
 
     @Post('/get_verify_code')
-    @SchemaResponse(200, {})
+    @HttpCode(200)
     async getVerifyCode(@Query() query: GetVerifyCodeDto) {
         return this.authService.getVerifyCode(query.email);
     }

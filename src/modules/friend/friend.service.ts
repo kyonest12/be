@@ -68,6 +68,7 @@ export class FriendService {
             throw new AppException(4003);
         }
 
+        // TODO: check whether target user is valid
         const newRequest = new FriendRequest({
             userId: user.id,
             targetId: user_id,
