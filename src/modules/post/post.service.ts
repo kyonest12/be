@@ -198,10 +198,6 @@ export class PostService {
 
         const posts = await query.getMany();
 
-        if (!posts.length) {
-            throw new AppException(9994);
-        }
-
         for (const post of posts) {
             if (post.marksCount) {
                 post.commentsCount = await this.commentRepo
@@ -385,10 +381,6 @@ export class PostService {
         }
 
         const posts = await query.getMany();
-
-        if (!posts.length) {
-            throw new AppException(9994);
-        }
 
         for (const post of posts) {
             post.images = [];

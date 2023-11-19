@@ -20,6 +20,8 @@ import { BlockController } from './modules/block/block.controller';
 import { BlockService } from './modules/block/block.service';
 import { SettingsController } from './modules/settings/settings.controller';
 import { SettingsService } from './modules/settings/settings.service';
+import { SearchController } from './modules/search/search.controller';
+import { SearchService } from './modules/search/search.service';
 
 @Module({
     imports: [
@@ -47,10 +49,11 @@ import { SettingsService } from './modules/settings/settings.service';
         AuthController,
         ProfileController,
         PostController,
+        SearchController,
         FriendController,
         BlockController,
         SettingsController,
     ],
-    providers: [ProfileService, PostService, FriendService, BlockService, SettingsService],
+    providers: [ProfileService, PostService, SearchService, FriendService, BlockService, SettingsService],
 })
 export class AppModule {}
