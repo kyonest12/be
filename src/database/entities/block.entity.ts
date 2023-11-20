@@ -26,10 +26,10 @@ export class Block extends BaseEntity {
     @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    @ManyToOne(() => User, (user) => user.blocked, { onDelete: 'CASCADE' })
     target: User;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    @ManyToOne(() => User, (user) => user.blocking, { onDelete: 'CASCADE' })
     user: User;
 
     constructor(props: Partial<Block>) {
