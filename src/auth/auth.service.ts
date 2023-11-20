@@ -187,6 +187,7 @@ export class AuthService {
         const user = verifyCode.user;
         user.password = await this.hashPassword(password);
         user.token = null;
+        await this.userRepo.save(user);
 
         return {};
     }
