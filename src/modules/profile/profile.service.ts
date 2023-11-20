@@ -67,7 +67,7 @@ export class ProfileService {
         const isFriend = user_id
             ? await this.friendRepository.findOneBy([
                   {
-                      friendId: user_id,
+                      targetId: user_id,
                       userId: user.id,
                   },
               ])
