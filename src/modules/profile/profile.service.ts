@@ -45,21 +45,22 @@ export class ProfileService {
     }
 
     async getUserInfo(user: User, { user_id }: GetUserInfoDto) {
-        // Check blocked
+        user_id ||= user.id;
+
         if (await this.blockService.isBlock(user.id, user_id)) {
             throw new AppException(3001);
         }
 
-        const userInfo = await this.userInfoRepository
+        let userInfo = await this.userInfoRepository
             .createQueryBuilder('userInfo')
             .where({
-                userId: user_id || user.id,
+                userId: user_id,
             })
             .innerJoinAndSelect('userInfo.user', 'user')
             .getOne();
 
         if (!userInfo) {
-            throw new AppException(9995);
+            userInfo = new UserInfo({ userId: user_id });
         }
 
         const totalFriends = await this.friendRepository.countBy({ userId: user_id || user.id });
