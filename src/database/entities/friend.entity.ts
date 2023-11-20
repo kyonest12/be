@@ -15,7 +15,7 @@ export class Friend extends BaseEntity {
     id: number;
 
     @Column({ type: 'int' })
-    friendId: number;
+    targetId: number;
 
     @Column({ type: 'int' })
     userId: number;
@@ -27,9 +27,9 @@ export class Friend extends BaseEntity {
     updatedAt: Date;
 
     @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    friend: User;
+    target: User;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    @ManyToOne(() => User, (user) => user.friends, { onDelete: 'CASCADE' })
     user: User;
 
     constructor(props: Partial<Friend>) {
