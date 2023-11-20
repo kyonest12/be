@@ -137,7 +137,7 @@ export class FriendService {
                     id: String(friend.target.id),
                     username: friend.target.username || '',
                     avatar: friend.target.avatar || '',
-                    same_friends: String(String(friend.target.friendsCount)),
+                    same_friends: String(friend.target.friendsCount),
                     created: friend.target.createdAt,
                 };
             }),
