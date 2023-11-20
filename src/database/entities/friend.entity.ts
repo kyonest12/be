@@ -29,7 +29,7 @@ export class Friend extends BaseEntity {
     @ManyToOne(() => User, { onDelete: 'CASCADE' })
     target: User;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    @ManyToOne(() => User, (user) => user.friends, { onDelete: 'CASCADE' })
     user: User;
 
     constructor(props: Partial<Friend>) {

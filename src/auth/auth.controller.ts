@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post, Query } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
@@ -43,7 +43,7 @@ export class AuthController {
 
     @Post('/get_verify_code')
     @HttpCode(200)
-    async getVerifyCode(@Query() query: GetVerifyCodeDto) {
+    async getVerifyCode(@Body() query: GetVerifyCodeDto) {
         return this.authService.getVerifyCode(query.email);
     }
 

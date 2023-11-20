@@ -23,6 +23,7 @@ Deploy:
     - yarn build
     - ssh ${USERNAME}@${SERVER_IP} "pm2 stop '$PROCESS_NAME'"
     - rsync -avq --delete ./dist/ ${USERNAME}@${SERVER_IP}:${APP_DIR}/dist
+    - rsync -avq ./uploads/ ${USERNAME}@${SERVER_IP}:${APP_DIR}/uploads
     - rsync -avq ./.env ${USERNAME}@${SERVER_IP}:${APP_DIR}
     - rsync -avq ./package.json ${USERNAME}@${SERVER_IP}:${APP_DIR}
     - rsync -avq ./yarn.lock ${USERNAME}@${SERVER_IP}:${APP_DIR}
