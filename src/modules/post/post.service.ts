@@ -122,7 +122,7 @@ export class PostService {
             .getOne();
 
         if (!post) {
-            throw new AppException(9994);
+            throw new AppException(9992);
         }
 
         if (getIsBlocked(post)) {
@@ -266,6 +266,7 @@ export class PostService {
                 .leftJoinAndSelect('post.images', 'image')
                 .leftJoinAndSelect('post.video', 'video')
                 .leftJoinAndSelect('post.marks', 'mark')
+                .leftJoinAndSelect('post.feels', 'feel')
                 .leftJoinAndSelect('mark.comments', 'comment')
                 .where({
                     id,
@@ -274,7 +275,7 @@ export class PostService {
                 .getOne();
 
             if (!post) {
-                throw new AppException(9994, 404);
+                throw new AppException(9992, 404);
             }
 
             let newPost: Post;
@@ -299,6 +300,7 @@ export class PostService {
                         }),
                     edited: post.edited,
                     marks: post.marks,
+                    feels: post.feels,
                 });
             }
 
@@ -334,6 +336,9 @@ export class PostService {
             }
             for (const mark of newPost.marks) {
                 mark.editable = true;
+            }
+            for (const feel of newPost.feels) {
+                feel.editable = true;
             }
 
             if (post !== newPost) {
@@ -446,7 +451,7 @@ export class PostService {
             });
 
             if (!post) {
-                throw new AppException(9994, 404);
+                throw new AppException(9992, 404);
             }
             await postRepo.delete(post.histories.map((e) => e.oldPostId));
             await postRepo.remove(post);
@@ -462,7 +467,7 @@ export class PostService {
         const post = await this.postRepo.findOneBy({ id });
 
         if (!post) {
-            throw new AppException(9994, 404);
+            throw new AppException(9992, 404);
         }
 
         const report = new Report({
