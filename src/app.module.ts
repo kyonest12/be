@@ -22,6 +22,8 @@ import { SettingsController } from './modules/settings/settings.controller';
 import { SettingsService } from './modules/settings/settings.service';
 import { SearchController } from './modules/search/search.controller';
 import { SearchService } from './modules/search/search.service';
+import { CommentController } from './modules/comment/comment.controller';
+import { CommentService } from './modules/comment/comment.service';
 
 @Module({
     imports: [
@@ -53,7 +55,16 @@ import { SearchService } from './modules/search/search.service';
         FriendController,
         BlockController,
         SettingsController,
+        CommentController,
     ],
-    providers: [ProfileService, PostService, SearchService, FriendService, BlockService, SettingsService],
+    providers: [
+        ProfileService,
+        PostService,
+        SearchService,
+        FriendService,
+        BlockService,
+        SettingsService,
+        CommentService,
+    ],
 })
 export class AppModule {}
