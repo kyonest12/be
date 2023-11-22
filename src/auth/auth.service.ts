@@ -49,7 +49,7 @@ export class AuthService {
         }
 
         const user = new User({
-            email,
+            email: email.toLowerCase(),
             password: await this.hashPassword(password),
             status: AccountStatus.Inactive,
             coins: 50,
@@ -60,9 +60,7 @@ export class AuthService {
 
     async login({ email, password, uuid: device_id }: LoginDto) {
         const user = await this.userRepo.findOne({
-            where: {
-                email: email.toLowerCase(),
-            },
+            where: { email: email.toLowerCase() },
         });
 
         if (!user || !(await this.comparePassword(user, password))) {
