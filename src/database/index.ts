@@ -6,6 +6,7 @@ import { Feel } from './entities/feel.entity';
 import { FriendRequest } from './entities/friend-request.entity';
 import { Friend } from './entities/friend.entity';
 import { Mark } from './entities/mark.entity';
+import { PostHistory } from './entities/post-history.entity';
 import { PostImage } from './entities/post-image.entity';
 import { PostVideo } from './entities/post-video.entity';
 import { Post } from './entities/post.entity';
@@ -22,6 +23,7 @@ export const entities = [
     VerifyCode,
     Category,
     Post,
+    PostHistory,
     PostImage,
     PostVideo,
     Mark,

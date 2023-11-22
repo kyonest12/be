@@ -27,8 +27,11 @@ export class Mark extends BaseEntity {
     @Column({ type: 'int2' }) // MarkType enum
     type: MarkType;
 
+    @Column({ type: 'bool', default: false })
+    editable: boolean;
+
     @Column({ type: 'int' })
-    posterId: number;
+    userId: number;
 
     @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
@@ -40,7 +43,7 @@ export class Mark extends BaseEntity {
     post: Post;
 
     @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    poster: User;
+    user: User;
 
     @OneToMany(() => Comment, (comment) => comment.mark)
     comments: Comment[];

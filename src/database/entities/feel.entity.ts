@@ -22,6 +22,9 @@ export class Feel extends BaseEntity {
     @Column({ type: 'int2' })
     type: FeelType;
 
+    @Column({ type: 'bool', default: false })
+    editable: boolean;
+
     @Column({ type: 'int' })
     userId: number;
 

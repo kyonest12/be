@@ -14,6 +14,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { VerifyCode } from '../database/entities/verify-code.entity';
 import { VerifyCodeStatus } from '../constants/verify-code-status.enum';
 import dayjs from '../utils/dayjs.util';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,14 +44,15 @@ export class AuthService {
             throw new AppException(9996);
         }
 
-        if (password.indexOf(email) != -1) {
+        if (password.indexOf(email) !== -1) {
             throw new AppException(9995);
         }
 
         const user = new User({
-            email,
+            email: email.toLowerCase(),
             password: await this.hashPassword(password),
             status: AccountStatus.Inactive,
+            coins: 50,
         });
         await this.userRepo.save(user);
         return this.getVerifyCode(email);
@@ -58,13 +60,11 @@ export class AuthService {
 
     async login({ email, password, uuid: device_id }: LoginDto) {
         const user = await this.userRepo.findOne({
-            where: {
-                email: email.toLowerCase(),
-            },
+            where: { email: email.toLowerCase() },
         });
 
         if (!user || !(await this.comparePassword(user, password))) {
-            throw new AppException(9995); // todo
+            throw new AppException(9991, 403);
         }
 
         user.token = this.jwtService.sign({ id: user.id, device_id }, jwtSignOptions);
@@ -77,6 +77,24 @@ export class AuthService {
             avatar: user.avatar || '',
             active: String(user.status),
             coins: String(user.coins),
+        };
+    }
+
+    async changePassword(user: User, { password, new_password }: ChangePasswordDto) {
+        if (!(await this.comparePassword(user, password))) {
+            throw new AppException(9990);
+        }
+
+        if (password.indexOf(user.email) !== -1) {
+            throw new AppException(9995);
+        }
+
+        user.password = await this.hashPassword(new_password);
+        user.token = this.jwtService.sign({ id: user.id, device_id: generateVerifyCode(6) }, jwtSignOptions);
+        await this.userRepo.save(user);
+
+        return {
+            token: user.token,
         };
     }
 
@@ -99,16 +117,6 @@ export class AuthService {
         }
 
         return user;
-    }
-
-    async changePassword(user: User, { oldPassword, newPassword }) {
-        if (!user || !(await this.comparePassword(user, oldPassword))) {
-            throw new AppException(9995);
-        }
-        user.password = await hash(newPassword, 10);
-        await this.userRepo.save(user);
-
-        return {};
     }
 
     async getVerifyCode(email: string) {

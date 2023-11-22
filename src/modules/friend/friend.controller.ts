@@ -39,9 +39,9 @@ export class FriendController {
         return this.friendService.getUserFriends(user, body);
     }
 
-    // @Post('/get_suggested_friends')
-    // @HttpCode(200)
-    // async getSuggestedFriends() {
-    //     return this.friendService.getSuggestedFriends();
-    // }
+    @Post('/get_suggested_friends')
+    @HttpCode(200)
+    async getSuggestedFriends(@AuthUser() user: User, @Body() body: GetListDto) {
+        return this.friendService.getSuggestedFriends(user, body);
+    }
 }

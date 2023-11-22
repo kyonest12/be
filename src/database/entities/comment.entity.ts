@@ -22,7 +22,7 @@ export class Comment extends BaseEntity {
     content: string;
 
     @Column({ type: 'int' })
-    posterId: number;
+    userId: number;
 
     @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
@@ -34,7 +34,7 @@ export class Comment extends BaseEntity {
     mark: Mark;
 
     @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    poster: User;
+    user: User;
 
     constructor(props: Partial<Comment>) {
         super();
