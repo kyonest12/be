@@ -4,6 +4,7 @@ import { NotificationType } from '../../constants/notification-type.enum';
 import { User } from './user.entity';
 import { Post } from './post.entity';
 import { Mark } from './mark.entity';
+import { Feel } from './feel.entity';
 
 @Entity('notifications')
 export class Notification extends BaseEntity {
@@ -18,6 +19,9 @@ export class Notification extends BaseEntity {
 
     @Column({ type: 'int', nullable: true })
     markId: number | null;
+
+    @Column({ type: 'int', nullable: true })
+    feelId: number | null;
 
     @Column({ type: 'int2' })
     type: NotificationType;
@@ -42,6 +46,9 @@ export class Notification extends BaseEntity {
 
     @ManyToOne(() => Mark, { onDelete: 'CASCADE' })
     mark: Mark | null;
+
+    @ManyToOne(() => Feel, { onDelete: 'CASCADE' })
+    feel: Feel | null;
 
     constructor(props: Partial<Notification>) {
         super();
