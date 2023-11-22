@@ -12,6 +12,7 @@ import { costs } from '../../constants/costs.constant';
 import { GetMarkCommentDto } from './dto/get_mark_comment.dto';
 import { concurrent } from '../../utils/concurrent.util';
 import { isNotEmpty } from 'class-validator';
+import { UnwrapResponse } from '../../utils/unwrap-response.util';
 
 @Injectable()
 export class CommentService {
@@ -171,6 +172,9 @@ export class CommentService {
             }
         }
 
-        return [await this.getMarkComment(user, { id, index, count }), { coins: String(user.coins) }];
+        return new UnwrapResponse({
+            data: await this.getMarkComment(user, { id, index, count }),
+            coins: String(user.coins),
+        });
     }
 }
