@@ -1,5 +1,4 @@
 import {
-    BaseEntity,
     Column,
     CreateDateColumn,
     Entity,
@@ -12,6 +11,7 @@ import { Post } from './post.entity';
 import { User } from './user.entity';
 import { Comment } from './comment.entity';
 import { MarkType } from '../../constants/mark-type.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('marks')
 export class Mark extends BaseEntity {
@@ -24,7 +24,7 @@ export class Mark extends BaseEntity {
     @Column({ type: 'text' })
     content: string;
 
-    @Column({ type: 'int2' }) // MarkType enum
+    @Column({ type: 'int2' })
     type: MarkType;
 
     @Column({ type: 'bool', default: false })

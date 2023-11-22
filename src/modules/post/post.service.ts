@@ -21,6 +21,7 @@ import { PostHistory } from '../../database/entities/post-history.entity';
 import { DeletePostDto } from './dto/delete-post.dto';
 import { ReportPostDto } from './dto/report-post.dto';
 import { Report } from '../../database/entities/report.entity';
+import { concurrent } from '../../utils/concurrent.util';
 
 @Injectable()
 export class PostService {
@@ -190,17 +191,17 @@ export class PostService {
 
         const posts = await query.getMany();
 
-        for (const post of posts) {
-            if (post.marksCount) {
-                post.commentsCount = await this.commentRepo
-                    .createQueryBuilder('comment')
-                    .innerJoin('comment.mark', 'mark')
-                    .where({ 'mark.postId': post.id })
-                    .getCount();
-            } else {
-                post.commentsCount = 0;
-            }
-        }
+        await concurrent(
+            posts.map((post) => async () => {
+                if (post.marksCount) {
+                    post.commentsCount = await this.commentRepo.countBy({
+                        mark: { postId: post.id },
+                    });
+                } else {
+                    post.commentsCount = 0;
+                }
+            }),
+        );
 
         const lastId = posts.at(-1)?.id as number;
         const newItems = await this.postRepo.countBy({ id: MoreThan(lastId) });
@@ -373,18 +374,17 @@ export class PostService {
 
         const posts = await query.getMany();
 
-        for (const post of posts) {
-            post.images = [];
-            if (post.marksCount) {
-                post.commentsCount = await this.commentRepo
-                    .createQueryBuilder('comment')
-                    .innerJoin('comment.mark', 'mark')
-                    .where({ 'mark.postId': post.id })
-                    .getCount();
-            } else {
-                post.commentsCount = 0;
-            }
-        }
+        await concurrent(
+            posts.map((post) => async () => {
+                if (post.marksCount) {
+                    post.commentsCount = await this.commentRepo.countBy({
+                        mark: { postId: post.id },
+                    });
+                } else {
+                    post.commentsCount = 0;
+                }
+            }),
+        );
 
         const lastId = posts.at(-1)?.id as number;
         const newItems = await this.postRepo.countBy({ id: MoreThan(lastId), video: {} });

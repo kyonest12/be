@@ -1,5 +1,4 @@
 import {
-    BaseEntity,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
@@ -18,6 +17,7 @@ import { Mark } from './mark.entity';
 import { Feel } from './feel.entity';
 import { Report } from './report.entity';
 import { PostHistory } from './post-history.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity('posts')
 export class Post extends BaseEntity {
