@@ -10,6 +10,8 @@ import { Post } from '../../database/entities/post.entity';
 import { BlockService } from '../block/block.service';
 import { costs } from '../../constants/costs.constant';
 import { GetMarkCommentDto } from './dto/get_mark_comment.dto';
+import { concurrent } from '../../utils/concurrent.util';
+import { isNotEmpty } from 'class-validator';
 
 @Injectable()
 export class CommentService {
@@ -25,8 +27,73 @@ export class CommentService {
         private blockService: BlockService,
     ) {}
 
-    async getMarkComment(user: User, body: GetMarkCommentDto) {
-        return {};
+    async getMarkComment(user: User, { id, index, count }: GetMarkCommentDto) {
+        const post = await this.postRepo.findOneBy({ id });
+
+        if (!post) {
+            throw new AppException(9992, 404);
+        }
+
+        if (await this.blockService.isBlock(user.id, post.authorId)) {
+            throw new AppException(3001);
+        }
+
+        const marks = await this.markRepo
+            .createQueryBuilder('mark')
+            .innerJoinAndSelect('mark.user', 'user')
+            .leftJoinAndSelect('user.blocked', 'blocked', 'blocked.userId = :userId', {
+                userId: user.id,
+            })
+            .leftJoinAndSelect('user.blocking', 'blocking', 'blocking.targetId = :userId', {
+                userId: user.id,
+            })
+            .orderBy({ 'mark.id': 'DESC' })
+            .where({ postId: id })
+            .andWhere('blocked.id IS NULL')
+            .andWhere('blocking.id IS NULL')
+            .skip(index)
+            .take(count)
+            .getMany();
+
+        await concurrent(
+            marks.map((mark) => async () => {
+                mark.comments = await this.commentRepo
+                    .createQueryBuilder('comment')
+                    .innerJoinAndSelect('comment.user', 'user')
+                    .leftJoinAndSelect('user.blocked', 'blocked', 'blocked.userId = :userId', {
+                        userId: user.id,
+                    })
+                    .leftJoinAndSelect('user.blocking', 'blocking', 'blocking.targetId = :userId', {
+                        userId: user.id,
+                    })
+                    .orderBy({ 'comment.id': 'ASC' })
+                    .where({ markId: mark.id })
+                    .andWhere('blocked.id IS NULL')
+                    .andWhere('blocking.id IS NULL')
+                    .getMany();
+            }),
+        );
+
+        return marks.map((mark) => ({
+            id: String(mark.id),
+            mark_content: mark.content,
+            type_of_mark: String(mark.type),
+            created: mark.createdAt,
+            poster: {
+                id: String(mark.user.id),
+                name: mark.user.username || '',
+                avatar: mark.user.avatar || '',
+            },
+            comments: mark.comments.map((comment) => ({
+                content: comment.content,
+                created: comment.createdAt,
+                poster: {
+                    id: String(comment.user.id),
+                    name: comment.user.username || '',
+                    avatar: comment.user.avatar || '',
+                },
+            })),
+        }));
     }
 
     async setMarkComment(user: User, { id, content, index, count, mark_id, type }: SetMarkCommentDto) {
@@ -71,7 +138,7 @@ export class CommentService {
 
             let checkReduceCoins = false;
             if (existingMark) {
-                if (type && type !== existingMark.type) {
+                if (isNotEmpty(type) && type !== existingMark.type) {
                     existingMark.type = type;
                     checkReduceCoins = true;
                 }
@@ -104,11 +171,6 @@ export class CommentService {
             }
         }
 
-        const markComment = await this.getMarkComment(user, { index, count });
-
-        return {
-            ...markComment,
-            coins: String(user.coins),
-        };
+        return [await this.getMarkComment(user, { id, index, count }), { coins: String(user.coins) }];
     }
 }
