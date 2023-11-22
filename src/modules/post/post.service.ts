@@ -12,14 +12,7 @@ import { GetPostDto } from './dto/get-post.dto';
 import { FeelType } from '../../constants/feel-type.enum';
 import { MarkType } from '../../constants/mark-type.enum';
 import { costs } from '../../constants/costs.constant';
-import {
-    getBanned,
-    getCanEdit,
-    getCanMark,
-    getCanRate,
-    getCategory,
-    getIsBlocked,
-} from '../../utils/get-post-subdata.util';
+import { getBanned, getCanEdit, getCanMark, getCanRate, getCategory } from '../../utils/get-post-subdata.util';
 import { GetListPostsDto } from './dto/get-list-posts.dto';
 import { Comment } from '../../database/entities/comment.entity';
 import { EditPostDto } from './dto/edit-post.dto';
@@ -114,7 +107,9 @@ export class PostService {
             .leftJoinAndSelect('author.blocking', 'blocking', 'blocking.targetId = :userId', {
                 userId: user.id,
             })
-            .where({ id })
+            .where('blocked.id IS NULL')
+            .andWhere('blocking.id IS NULL')
+            .andWhere({ id })
             .orderBy({
                 'image.order': 'ASC',
                 'history.id': 'DESC',
@@ -122,50 +117,45 @@ export class PostService {
             .getOne();
 
         if (!post) {
-            throw new AppException(9992);
+            throw new AppException(9992, 404);
         }
+        console.log(post?.createdAt.getHours());
 
-        if (getIsBlocked(post)) {
-            return {
-                id_blocked: '1',
-            };
-        } else {
-            return {
-                id: String(post.id),
-                name: '',
-                created: post.createdAt,
-                described: post.description || '',
-                modified: String(post.edited),
-                fake: String(post.fakeCount),
-                trust: String(post.trustCount),
-                kudos: String(post.kudosCount),
-                disappointed: String(post.disappointedCount),
-                is_rated: post.feelOfUser ? '1' : '0',
-                is_marked: post.markOfUser ? '1' : '0',
-                image: post.images.map((e) => ({
-                    id: String(e.order),
-                    url: e.url,
-                })),
-                video: post.video ? { url: post.video.url } : undefined,
-                author: {
-                    id: String(post.author.id),
-                    name: post.author.username || '',
-                    avatar: post.author.avatar || '',
-                    coins: String(post.author.coins),
-                    listing: post.histories.map((e) => String(e.oldPostId)),
-                },
-                category: getCategory(post),
-                state: post.status || '',
-                is_blocked: '0',
-                can_edit: getCanEdit(post, user),
-                banned: getBanned(post),
-                can_mark: getCanMark(post, user),
-                can_rate: getCanRate(post, user),
-                url: '',
-                messages: '',
-                // deleted: post.deletedAt ? post.deletedAt : undefined,
-            };
-        }
+        return {
+            id: String(post.id),
+            name: '',
+            created: post.createdAt,
+            described: post.description || '',
+            modified: String(post.edited),
+            fake: String(post.fakeCount),
+            trust: String(post.trustCount),
+            kudos: String(post.kudosCount),
+            disappointed: String(post.disappointedCount),
+            is_rated: post.feelOfUser ? '1' : '0',
+            is_marked: post.markOfUser ? '1' : '0',
+            image: post.images.map((e) => ({
+                id: String(e.order),
+                url: e.url,
+            })),
+            video: post.video ? { url: post.video.url } : undefined,
+            author: {
+                id: String(post.author.id),
+                name: post.author.username || '',
+                avatar: post.author.avatar || '',
+                coins: String(post.author.coins),
+                listing: post.histories.map((e) => String(e.oldPostId)),
+            },
+            category: getCategory(post),
+            state: post.status || '',
+            is_blocked: '0',
+            can_edit: getCanEdit(post, user),
+            banned: getBanned(post),
+            can_mark: getCanMark(post, user),
+            can_rate: getCanRate(post, user),
+            url: '',
+            messages: '',
+            deleted: post.deletedAt ? post.deletedAt : undefined,
+        };
     }
 
     async getListPosts(user: User, { last_id, index, count }: GetListPostsDto) {
@@ -185,6 +175,8 @@ export class PostService {
             .leftJoinAndSelect('author.blocking', 'blocking', 'blocking.targetId = :userId', {
                 userId: user.id,
             })
+            .where('blocked.id IS NULL')
+            .andWhere('blocking.id IS NULL')
             .orderBy({
                 'post.id': 'ASC',
                 'image.order': 'ASC',
@@ -214,37 +206,29 @@ export class PostService {
         const newItems = await this.postRepo.countBy({ id: MoreThan(lastId) });
 
         return {
-            post: posts.map((post) => {
-                if (getIsBlocked(post)) {
-                    return {
-                        id_blocked: '1',
-                    };
-                } else {
-                    return {
-                        id: String(post.id),
-                        name: '',
-                        image: post.images.map((e) => ({
-                            id: String(e.order),
-                            url: e.url,
-                        })),
-                        video: post.video ? { url: post.video.url } : undefined,
-                        described: post.description || '',
-                        created: post.createdAt,
-                        feel: String(post.feelsCount),
-                        comment_mark: String(post.marksCount + post.commentsCount),
-                        is_felt: post.feelOfUser ? '1' : '0',
-                        is_blocked: '0',
-                        can_edit: getCanEdit(post, user),
-                        banned: getBanned(post),
-                        state: post.status || '',
-                        author: {
-                            id: String(post.author.id),
-                            name: post.author.username || '',
-                            avatar: post.author.avatar || '',
-                        },
-                    };
-                }
-            }),
+            post: posts.map((post) => ({
+                id: String(post.id),
+                name: '',
+                image: post.images.map((e) => ({
+                    id: String(e.order),
+                    url: e.url,
+                })),
+                video: post.video ? { url: post.video.url } : undefined,
+                described: post.description || '',
+                created: post.createdAt,
+                feel: String(post.feelsCount),
+                comment_mark: String(post.marksCount + post.commentsCount),
+                is_felt: post.feelOfUser ? '1' : '0',
+                is_blocked: '0',
+                can_edit: getCanEdit(post, user),
+                banned: getBanned(post),
+                state: post.status || '',
+                author: {
+                    id: String(post.author.id),
+                    name: post.author.username || '',
+                    avatar: post.author.avatar || '',
+                },
+            })),
             new_items: String(newItems),
             last_id: String(lastId),
         };
@@ -377,6 +361,8 @@ export class PostService {
             .leftJoinAndSelect('author.blocking', 'blocking', 'blocking.targetId = :userId', {
                 userId: user.id,
             })
+            .where('blocked.id IS NULL')
+            .andWhere('blocking.id IS NULL')
             .orderBy({ 'post.id': 'ASC' })
             .skip(index)
             .take(count);
@@ -404,37 +390,29 @@ export class PostService {
         const newItems = await this.postRepo.countBy({ id: MoreThan(lastId), video: {} });
 
         return {
-            post: posts.map((post) => {
-                if (getIsBlocked(post)) {
-                    return {
-                        id_blocked: '1',
-                    };
-                } else {
-                    return {
-                        id: String(post.id),
-                        name: '',
-                        image: post.images.map((e) => ({
-                            id: String(e.order),
-                            url: e.url,
-                        })),
-                        video: post.video ? { url: post.video.url } : undefined,
-                        described: post.description || '',
-                        created: post.createdAt,
-                        feel: String(post.feelsCount),
-                        comment_mark: String(post.marksCount + post.commentsCount),
-                        is_felt: post.feelOfUser ? '1' : '0',
-                        is_blocked: '0',
-                        can_edit: getCanEdit(post, user),
-                        banned: getBanned(post),
-                        state: post.status || '',
-                        author: {
-                            id: String(post.author.id),
-                            name: post.author.username || '',
-                            avatar: post.author.avatar || '',
-                        },
-                    };
-                }
-            }),
+            post: posts.map((post) => ({
+                id: String(post.id),
+                name: '',
+                image: post.images.map((e) => ({
+                    id: String(e.order),
+                    url: e.url,
+                })),
+                video: post.video ? { url: post.video.url } : undefined,
+                described: post.description || '',
+                created: post.createdAt,
+                feel: String(post.feelsCount),
+                comment_mark: String(post.marksCount + post.commentsCount),
+                is_felt: post.feelOfUser ? '1' : '0',
+                is_blocked: '0',
+                can_edit: getCanEdit(post, user),
+                banned: getBanned(post),
+                state: post.status || '',
+                author: {
+                    id: String(post.author.id),
+                    name: post.author.username || '',
+                    avatar: post.author.avatar || '',
+                },
+            })),
             new_items: String(newItems),
             last_id: String(lastId),
         };
