@@ -38,7 +38,11 @@ export const getCanMark = (post: Post, user: User) => {
             return '-4';
         }
         if (post.markOfUser) {
-            return '2';
+            if (post.markOfUser.editable) {
+                return '2';
+            } else {
+                return '0';
+            }
         } else {
             return '1';
         }
@@ -56,7 +60,11 @@ export const getCanRate = (post: Post, user: User) => {
             return '-4';
         }
         if (post.feelOfUser) {
-            return '2';
+            if (post.feelOfUser.editable) {
+                return '2';
+            } else {
+                return '0';
+            }
         } else {
             return '1';
         }
