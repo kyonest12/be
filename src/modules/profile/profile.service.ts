@@ -11,6 +11,8 @@ import { UserInfo } from '../../database/entities/user-info.entity';
 import { Friend } from '../../database/entities/friend.entity';
 import { BlockService } from '../block/block.service';
 import { SetUserInfoDto } from './dto/set-user-info.dto';
+import { getIsFriend } from '../../utils/get-user-info-subdata';
+import { FriendRequest } from '../../database/entities/friend-request.entity';
 
 @Injectable()
 export class ProfileService {
@@ -21,6 +23,8 @@ export class ProfileService {
         private userInfoRepository: Repository<UserInfo>,
         @InjectRepository(Friend)
         private friendRepository: Repository<Friend>,
+        @InjectRepository(FriendRequest)
+        private friendRequestRepository: Repository<FriendRequest>,
         private blockService: BlockService,
     ) {}
 
@@ -68,14 +72,12 @@ export class ProfileService {
         }
 
         const totalFriends = await this.friendRepository.countBy({ userId: user_id || user.id });
-        const isFriend = user_id
-            ? await this.friendRepository.findOneBy([
-                  {
-                      targetId: user_id,
-                      userId: user.id,
-                  },
-              ])
-            : true;
+
+        const [friend, friendRequested, friendRequesting] = await Promise.all([
+            this.friendRepository.findOneBy({ userId: user.id, targetId: user_id }),
+            this.friendRequestRepository.findOneBy({ userId: user.id, targetId: user_id }),
+            this.friendRequestRepository.findOneBy({ userId: user_id, targetId: user.id }),
+        ]);
 
         return {
             id: String(_user.id),
@@ -89,7 +91,7 @@ export class ProfileService {
             city: userInfo.city || '',
             country: userInfo.country || '',
             listing: String(totalFriends),
-            is_friend: String(isFriend),
+            is_friend: getIsFriend(friend, friendRequested, friendRequesting),
             online: '1',
             coins: user_id ? String(_user.coins) : '',
         };
