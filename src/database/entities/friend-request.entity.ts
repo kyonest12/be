@@ -13,6 +13,9 @@ export class FriendRequest extends BaseEntity {
     @Column({ type: 'int' })
     userId: number;
 
+    @Column({ type: 'boolean', default: false })
+    read: boolean;
+
     @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
 
