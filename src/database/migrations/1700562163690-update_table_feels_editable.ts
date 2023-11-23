@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class UpdateTableFeelsEditable1700562163690 implements MigrationInterface {
-    name = 'UpdateTableFeelsEditable1700562163690'
+    name = 'UpdateTableFeelsEditable1700562163690';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -15,5 +15,4 @@ export class UpdateTableFeelsEditable1700562163690 implements MigrationInterface
             ALTER TABLE "feels" DROP COLUMN "editable"
         `);
     }
-
 }

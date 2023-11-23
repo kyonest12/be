@@ -1,14 +1,7 @@
-import {
-    BaseEntity,
-    Column,
-    CreateDateColumn,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { User } from './user.entity';
 import { DevTokenType } from '../../constants/dev-token-type.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('dev_tokens')
 export class DevToken extends BaseEntity {

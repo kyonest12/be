@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DevToken } from 'src/database/entities/dev-token.entity';
+import { DevToken } from '../../database/entities/dev-token.entity';
 import { User } from '../../database/entities/user.entity';
 import { SetDevtokenDto } from './dto/set-devtoken.dto';
 import { BuyCoinsDto } from './dto/buy_coins.dto';

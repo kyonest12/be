@@ -1,16 +1,8 @@
-import {
-    BaseEntity,
-    Column,
-    CreateDateColumn,
-    Entity,
-    Index,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-    OneToMany,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { AccountStatus } from '../../constants/account-status.enum';
 import { Block } from './block.entity';
 import { Friend } from './friend.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity('users')
 export class User extends BaseEntity {

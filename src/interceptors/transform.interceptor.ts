@@ -1,6 +1,7 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { UnwrapResponse } from '../utils/unwrap-response.util';
 
 export interface Response<T> {
     data: T;
@@ -9,6 +10,17 @@ export interface Response<T> {
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
     intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
-        return next.handle().pipe(map((data) => ({ code: '1000', message: 'OK', data })));
+        return next.handle().pipe(
+            map((data) => {
+                if (data instanceof UnwrapResponse) {
+                    return {
+                        code: '1000',
+                        message: 'OK',
+                        ...data.data,
+                    };
+                }
+                return { code: '1000', message: 'OK', data };
+            }),
+        );
     }
 }

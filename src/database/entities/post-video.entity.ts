@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from './post.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity('post_videos')
 export class PostVideo extends BaseEntity {

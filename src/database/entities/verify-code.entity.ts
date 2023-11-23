@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 import { VerifyCodeStatus } from '../../constants/verify-code-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('verify_codes')
 export class VerifyCode extends BaseEntity {
