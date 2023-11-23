@@ -6,6 +6,7 @@ import { User } from '../../database/entities/user.entity';
 import { SettingsService } from './settings.service';
 import { SetDevtokenDto } from './dto/set-devtoken.dto';
 import { BuyCoinsDto } from './dto/buy_coins.dto';
+import { SetPushSettingsDto } from './dto/set-push-settings';
 
 @Controller('settings')
 @ApiTags('Settings')
@@ -23,5 +24,17 @@ export class SettingsController {
     @HttpCode(200)
     async buyCoins(@AuthUser() user: User, @Body() body: BuyCoinsDto) {
         return this.settingsService.buyCoins(user, body);
+    }
+
+    @Post('/get_push_settings')
+    @HttpCode(200)
+    async getPushSettings(@AuthUser() user: User) {
+        return this.settingsService.getPushSettings(user);
+    }
+
+    @Post('/set_push_settings')
+    @HttpCode(200)
+    async setPushSettings(@AuthUser() user: User, @Body() body: SetPushSettingsDto) {
+        return this.settingsService.setPushSettings(user, body);
     }
 }
