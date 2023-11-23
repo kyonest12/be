@@ -13,6 +13,9 @@ import { GetMarkCommentDto } from './dto/get_mark_comment.dto';
 import { concurrent } from '../../utils/concurrent.util';
 import { isNotEmpty } from 'class-validator';
 import { UnwrapResponse } from '../../utils/unwrap-response.util';
+import { FeelDto } from './dto/feel.dto';
+import { Feel } from '../../database/entities/feel.entity';
+import { FeelType } from '../../constants/feel-type.enum';
 
 @Injectable()
 export class CommentService {
@@ -25,6 +28,8 @@ export class CommentService {
         private postRepo: Repository<Post>,
         @InjectRepository(User)
         private userRepo: Repository<User>,
+        @InjectRepository(Feel)
+        private feelRepo: Repository<Feel>,
         private blockService: BlockService,
     ) {}
 
@@ -140,6 +145,10 @@ export class CommentService {
             let checkReduceCoins = false;
             if (existingMark) {
                 if (isNotEmpty(type) && type !== existingMark.type) {
+                    if (user.coins < costs.createMark) {
+                        throw new AppException(2001);
+                    }
+
                     existingMark.type = type;
                     checkReduceCoins = true;
                 }
@@ -176,5 +185,57 @@ export class CommentService {
             data: await this.getMarkComment(user, { id, index, count }),
             coins: String(user.coins),
         });
+    }
+
+    async feel(user: User, { id, type }: FeelDto) {
+        const post = await this.postRepo.findOneBy({ id });
+
+        if (!post) {
+            throw new AppException(9992, 404);
+        }
+
+        if (await this.blockService.isBlock(user.id, post.authorId)) {
+            throw new AppException(3001);
+        }
+
+        let feel = await this.feelRepo.findOneBy({ postId: id, userId: user.id });
+
+        let checkReduceCoins = false;
+        if (feel) {
+            if (type !== feel.type) {
+                checkReduceCoins = true;
+                feel.type = type;
+            }
+        } else {
+            checkReduceCoins = true;
+
+            feel = new Feel({
+                postId: post.id,
+                userId: user.id,
+                type,
+            });
+        }
+
+        if (checkReduceCoins) {
+            if (user.coins < costs.createFeel) {
+                throw new AppException(2001);
+            }
+
+            user.coins -= costs.createFeel;
+
+            await this.userRepo.save(user);
+
+            await this.feelRepo.save(feel);
+        }
+
+        const [disappointed, kudos] = await Promise.all([
+            this.feelRepo.countBy({ postId: id, type: FeelType.Disappointed }),
+            this.feelRepo.countBy({ postId: id, type: FeelType.Kudos }),
+        ]);
+
+        return {
+            disappointed: String(disappointed),
+            kudos: String(kudos),
+        };
     }
 }
