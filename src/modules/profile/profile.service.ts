@@ -133,7 +133,7 @@ export class ProfileService {
         }
 
         const updatedUserInfo = await this.userInfoRepository.save(userInfo);
-        const updatedUser = await this.userInfoRepository.save(_user);
+        const updatedUser = await this.userRepository.save(_user);
 
         return {
             avatar: updatedUser.avatar || '',
