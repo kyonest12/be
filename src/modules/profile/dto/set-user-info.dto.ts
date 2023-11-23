@@ -1,6 +1,7 @@
 import { FileTypeValidator, FileValidator, MaxFileSizeValidator, ParseFilePipe } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Allow, IsOptional, IsString } from 'class-validator';
+import { mbToBits } from '../../../utils/mb-to-bits.util';
 
 export class SetUserInfoDto {
     @ApiProperty({ required: false, type: 'string', example: 'username' })
@@ -44,12 +45,12 @@ export class SetUserInfoDto {
 
 class UserInfoFilesValidator extends FileValidator {
     avatarValidator = {
-        maxSize: new MaxFileSizeValidator({ maxSize: 209715200 }),
+        maxSize: new MaxFileSizeValidator({ maxSize: mbToBits(25) }),
         fileType: new FileTypeValidator({ fileType: /jpeg|png|jpg|svg/ }),
     };
 
     coverImageValidator = {
-        maxSize: new MaxFileSizeValidator({ maxSize: 209715200 }),
+        maxSize: new MaxFileSizeValidator({ maxSize: mbToBits(25) }),
         fileType: new FileTypeValidator({ fileType: /jpeg|png|jpg|svg/ }),
     };
 

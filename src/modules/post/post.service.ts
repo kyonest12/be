@@ -120,7 +120,6 @@ export class PostService {
         if (!post) {
             throw new AppException(9992, 404);
         }
-        console.log(post?.createdAt.getHours());
 
         return {
             id: String(post.id),
@@ -133,7 +132,18 @@ export class PostService {
             kudos: String(post.kudosCount),
             disappointed: String(post.disappointedCount),
             is_rated: post.feelOfUser ? '1' : '0',
+            your_feel: post.feelOfUser
+                ? {
+                      type: String(post.feelOfUser.type),
+                  }
+                : undefined,
             is_marked: post.markOfUser ? '1' : '0',
+            your_mark: post.markOfUser
+                ? {
+                      mark_content: post.markOfUser.content,
+                      type_of_mark: String(post.markOfUser.type),
+                  }
+                : undefined,
             image: post.images.map((e) => ({
                 id: String(e.order),
                 url: e.url,
@@ -220,6 +230,11 @@ export class PostService {
                 feel: String(post.feelsCount),
                 comment_mark: String(post.marksCount + post.commentsCount),
                 is_felt: post.feelOfUser ? '1' : '0',
+                your_feel: post.feelOfUser
+                    ? {
+                          type: String(post.feelOfUser.type),
+                      }
+                    : undefined,
                 is_blocked: '0',
                 can_edit: getCanEdit(post, user),
                 banned: getBanned(post),
@@ -393,16 +408,17 @@ export class PostService {
             post: posts.map((post) => ({
                 id: String(post.id),
                 name: '',
-                image: post.images.map((e) => ({
-                    id: String(e.order),
-                    url: e.url,
-                })),
                 video: post.video ? { url: post.video.url } : undefined,
                 described: post.description || '',
                 created: post.createdAt,
                 feel: String(post.feelsCount),
                 comment_mark: String(post.marksCount + post.commentsCount),
                 is_felt: post.feelOfUser ? '1' : '0',
+                your_feel: post.feelOfUser
+                    ? {
+                          type: String(post.feelOfUser.type),
+                      }
+                    : undefined,
                 is_blocked: '0',
                 can_edit: getCanEdit(post, user),
                 banned: getBanned(post),

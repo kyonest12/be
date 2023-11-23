@@ -71,9 +71,8 @@ export class ProfileService {
             userInfo = new UserInfo({ userId: user_id });
         }
 
-        const totalFriends = await this.friendRepository.countBy({ userId: user_id || user.id });
-
-        const [friend, friendRequested, friendRequesting] = await Promise.all([
+        const [totalFriends, friend, friendRequested, friendRequesting] = await Promise.all([
+            this.friendRepository.countBy({ userId: user_id || user.id }),
             this.friendRepository.findOneBy({ userId: user.id, targetId: user_id }),
             this.friendRequestRepository.findOneBy({ userId: user.id, targetId: user_id }),
             this.friendRequestRepository.findOneBy({ userId: user_id, targetId: user.id }),
