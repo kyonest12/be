@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DevToken } from '../../database/entities/dev-token.entity';
 import { User } from '../../database/entities/user.entity';
 import { SetDevtokenDto } from './dto/set-devtoken.dto';
-import { BuyCoinsDto } from './dto/buy_coins.dto';
+import { BuyCoinsDto } from './dto/buy-coins.dto';
 
 @Injectable()
 export class SettingsService {

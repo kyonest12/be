@@ -4,18 +4,19 @@ import { Repository } from 'typeorm';
 import { Comment } from '../../database/entities/comment.entity';
 import { User } from '../../database/entities/user.entity';
 import { Mark } from '../../database/entities/mark.entity';
-import { SetMarkCommentDto } from './dto/set_mark_comment.dto';
+import { SetMarkCommentDto } from './dto/set-mark-comment.dto';
 import { AppException } from '../../exceptions/app.exception';
 import { Post } from '../../database/entities/post.entity';
 import { BlockService } from '../block/block.service';
 import { costs } from '../../constants/costs.constant';
-import { GetMarkCommentDto } from './dto/get_mark_comment.dto';
+import { GetMarkCommentDto } from './dto/get-mark-comment.dto';
 import { concurrent } from '../../utils/concurrent.util';
 import { isNotEmpty } from 'class-validator';
 import { UnwrapResponse } from '../../utils/unwrap-response.util';
 import { FeelDto } from './dto/feel.dto';
 import { Feel } from '../../database/entities/feel.entity';
 import { FeelType } from '../../constants/feel-type.enum';
+import { GetListFeelsDto } from './dto/get-list-feels.dto';
 
 @Injectable()
 export class CommentService {
@@ -224,7 +225,6 @@ export class CommentService {
             user.coins -= costs.createFeel;
 
             await this.userRepo.save(user);
-
             await this.feelRepo.save(feel);
         }
 
@@ -237,5 +237,46 @@ export class CommentService {
             disappointed: String(disappointed),
             kudos: String(kudos),
         };
+    }
+
+    async getListFeels(user: User, { id, index, count }: GetListFeelsDto) {
+        const post = await this.postRepo.findOneBy({ id });
+
+        if (!post) {
+            throw new AppException(9992, 404);
+        }
+
+        if (await this.blockService.isBlock(user.id, post.authorId)) {
+            throw new AppException(3001);
+        }
+
+        const feels = await this.feelRepo
+            .createQueryBuilder('feel')
+            .innerJoinAndSelect('feel.user', 'user')
+            .leftJoinAndSelect('user.blocked', 'blocked', 'blocked.userId = :userId', {
+                userId: user.id,
+            })
+            .leftJoinAndSelect('user.blocking', 'blocking', 'blocking.targetId = :userId', {
+                userId: user.id,
+            })
+            .orderBy({ 'feel.id': 'DESC' })
+            .where({ postId: id })
+            .andWhere('blocked.id IS NULL')
+            .andWhere('blocking.id IS NULL')
+            .skip(index)
+            .take(count)
+            .getMany();
+
+        return feels.map((feel) => ({
+            id: String(feel.id),
+            feel: {
+                user: {
+                    id: String(feel.user.id),
+                    name: feel.user.username || '',
+                    avatar: feel.user.avatar || '',
+                },
+                type: String(feel.type),
+            },
+        }));
     }
 }
