@@ -3,6 +3,7 @@ import { AccountStatus } from '../../constants/account-status.enum';
 import { Block } from './block.entity';
 import { Friend } from './friend.entity';
 import { BaseEntity } from './base.entity';
+import { FriendRequest } from './friend-request.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -42,6 +43,9 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Block, (block) => block.user)
     blocking: Block[];
+
+    @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.target)
+    friendRequested: FriendRequest[];
 
     @OneToMany(() => Friend, (friend) => friend.user)
     friends: Friend[];

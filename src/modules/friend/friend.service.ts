@@ -151,10 +151,12 @@ export class FriendService {
             .leftJoinAndSelect('user.blocked', 'blocked', 'blocked.userId = :userId', { userId: user.id })
             .leftJoinAndSelect('user.blocking', 'blocking', 'blocking.userId = :userId', { userId: user.id })
             .leftJoinAndSelect('user.friends', 'friend', 'friend.targetId = :targetId', { targetId: user.id })
+            .leftJoinAndSelect('user.friendRequested', 'requested', 'requested.userId = :userId', { userId: user.id })
             .where({ id: Not(user.id) })
             .andWhere('friend.id IS NULL')
             .andWhere('blocked.id IS NULL')
             .andWhere('blocking.id IS NULL')
+            .andWhere('requested.id IS NULL')
             .loadRelationCountAndMap('user.friendsCount', 'user.friends', 'friend', (qb) =>
                 qb.where({ targetId: user.id }),
             )
