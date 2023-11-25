@@ -5,7 +5,7 @@ import { AuthUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../database/entities/user.entity';
 import { SettingsService } from './settings.service';
 import { SetDevtokenDto } from './dto/set-devtoken.dto';
-import { BuyCoinsDto } from './dto/buy_coins.dto';
+import { BuyCoinsDto } from './dto/buy-coins.dto';
 import { SetPushSettingsDto } from './dto/set-push-settings';
 
 @Controller('settings')

@@ -4,9 +4,10 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { CommentService } from './comment.service';
 import { AuthUser } from 'src/auth/decorators/user.decorator';
 import { User } from 'src/database/entities/user.entity';
-import { SetMarkCommentDto } from './dto/set_mark_comment.dto';
-import { GetMarkCommentDto } from './dto/get_mark_comment.dto';
+import { SetMarkCommentDto } from './dto/set-mark-comment.dto';
+import { GetMarkCommentDto } from './dto/get-mark-comment.dto';
 import { FeelDto } from './dto/feel.dto';
+import { GetListFeelsDto } from './dto/get-list-feels.dto';
 
 @Controller()
 @ApiTags('Comment')
@@ -30,5 +31,11 @@ export class CommentController {
     @HttpCode(200)
     async feel(@AuthUser() user: User, @Body() body: FeelDto) {
         return this.commentService.feel(user, body);
+    }
+
+    @Post('/get-list-feels')
+    @HttpCode(200)
+    async getListFeels(@AuthUser() user: User, @Body() body: GetListFeelsDto) {
+        return this.commentService.getListFeels(user, body);
     }
 }

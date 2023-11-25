@@ -5,7 +5,7 @@ import { DevToken } from '../../database/entities/dev-token.entity';
 import { User } from '../../database/entities/user.entity';
 import { PushSettings } from '../../database/entities/push-settings.entity';
 import { SetDevtokenDto } from './dto/set-devtoken.dto';
-import { BuyCoinsDto } from './dto/buy_coins.dto';
+import { BuyCoinsDto } from './dto/buy-coins.dto';
 import { SetPushSettingsDto } from './dto/set-push-settings';
 
 @Injectable()
