@@ -455,7 +455,7 @@ export class PostService {
             user.coins -= costs.deletePost;
             await userRepo.save(user);
 
-            return user.coins;
+            return { coins: String(user.coins) };
         });
     }
 
