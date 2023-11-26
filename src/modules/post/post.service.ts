@@ -447,7 +447,9 @@ export class PostService {
             if (!post) {
                 throw new AppException(9992, 404);
             }
-            await postRepo.delete(post.histories.map((e) => e.oldPostId));
+            if (post.histories.length) {
+                await postRepo.delete(post.histories.map((e) => e.oldPostId));
+            }
             await postRepo.remove(post);
 
             user.coins -= costs.deletePost;

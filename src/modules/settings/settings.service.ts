@@ -56,7 +56,7 @@ export class SettingsService {
         pushSettings.likeComment = body.like_comment;
         pushSettings.fromFriends = body.from_friends;
         pushSettings.friendRequests = body.requested_friend;
-        pushSettings.suggestedFriends = body.suggested_frined;
+        pushSettings.suggestedFriends = body.suggested_friend;
         pushSettings.birthdays = body.birthday;
         pushSettings.videos = body.video;
         pushSettings.reports = body.report;

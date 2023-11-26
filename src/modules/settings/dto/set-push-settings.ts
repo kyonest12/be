@@ -21,7 +21,7 @@ export class SetPushSettingsDto {
     @ApiProperty({ type: 'string', example: '1' })
     @ParseBoolean()
     @IsBoolean()
-    suggested_frined: boolean;
+    suggested_friend: boolean;
 
     @ApiProperty({ type: 'string', example: '1' })
     @ParseBoolean()
