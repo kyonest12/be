@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { IsInt, IsOptional } from 'class-validator';
 import { AddPostDto } from './add-post.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { ParseArray } from '../../../utils/customed-validation.util';
+import { ParseArray } from '../../../utils/custom-validation.util';
 
 export class EditPostDto extends AddPostDto {
     @ApiProperty({ type: 'string', example: '1' })

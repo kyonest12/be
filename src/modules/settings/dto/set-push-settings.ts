@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean } from 'class-validator';
-import { ParseBoolean } from '../../../utils/customed-validation.util';
+import { ParseBoolean } from '../../../utils/custom-validation.util';
 
 export class SetPushSettingsDto {
     @ApiProperty({ type: 'string', example: '1' })
