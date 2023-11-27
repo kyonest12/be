@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
+import { ExistEmailDto } from './dto/check-exist-email.dto';
 import { User } from '../database/entities/user.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { GetVerifyCodeDto } from './dto/get-verify-code.dto';
@@ -15,6 +16,11 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 @ApiTags('Auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
+
+    @Post('checkexistemail')
+    async checkExist(@Body() body: ExistEmailDto) {
+        return this.authService.checkExist(body);
+    }
 
     @Post('/signup')
     async signup(@Body() body: SignupDto) {

@@ -22,6 +22,9 @@ export class UserInfo extends BaseEntity {
     country: string | null;
 
     @Column({ type: 'varchar', nullable: true })
+    birthday: Date | null;
+
+    @Column({ type: 'varchar', nullable: true })
     link: string | null;
 
     @Column({ type: 'varchar', nullable: true })

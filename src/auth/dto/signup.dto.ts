@@ -12,8 +12,12 @@ export class SignupDto {
     @Length(6, 10)
     password: string;
 
-    @ApiProperty({ example: 'string' })
+    @ApiProperty({ example: 'lmao' })
     @IsString()
     @IsNotEmpty()
-    uuid: string;
+    name: string;
+
+    @ApiProperty({ example: '1907-11-24T08:23:10.555Z' })
+    @IsNotEmpty()
+    birthday: Date;
 }

@@ -15,6 +15,7 @@ import { VerifyCode } from '../database/entities/verify-code.entity';
 import { VerifyCodeStatus } from '../constants/verify-code-status.enum';
 import dayjs from '../utils/dayjs.util';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ExistEmailDto } from './dto/check-exist-email.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,22 +40,30 @@ export class AuthService {
         return this.userRepo.findOneBy({ email });
     }
 
-    async signup({ email, password }: SignupDto) {
+    async checkExist({ email }: ExistEmailDto) {
         if (await this.doesEmailExist(email)) {
             throw new AppException(9996);
         }
+        return {};
+    }
 
-        if (password.indexOf(email) !== -1) {
-            throw new AppException(9995);
+    async signup({ email, password, birthday, name }: SignupDto) {
+        if (await this.doesEmailExist(email)) {
+            throw new AppException(9996);
         }
 
         const user = new User({
             email,
             password: await this.hashPassword(password),
-            status: AccountStatus.Inactive,
+            status: AccountStatus.Active,
+            username: name,
             coins: 50,
+            birthday: birthday,
         });
+
+        console.log(user.password);
         await this.userRepo.save(user);
+        console.log("success")
         return this.getVerifyCode(email);
     }
 
@@ -135,12 +144,6 @@ export class AuthService {
 
         await this.verifyCodeRepo.update({ userId: user.id }, { status: VerifyCodeStatus.Inactive });
         await this.verifyCodeRepo.save(verifyCode);
-        await this.mailerService.sendMail({
-            to: email,
-            subject: 'Verify code',
-            text: `This is your verify code ${code} `,
-        });
-
         return {
             verify_code: String(code),
         };

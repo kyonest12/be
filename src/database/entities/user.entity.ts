@@ -39,6 +39,9 @@ export class User extends BaseEntity {
     @Column({ type: 'int', default: 0 })
     coins: number;
 
+    @Column({ type: 'timestamp', nullable: true })
+    birthday: Date;
+
     @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
 

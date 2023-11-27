@@ -23,11 +23,11 @@
     "deploy:migrate": "node ./node_modules/typeorm/cli.js -d dist/database/orm.config.js migration:run"
   },
   "dependencies": {
-    "@nestjs-modules/mailer": "^1.9.1",
+    "@nestjs-modules/mailer": "^1.7.1",
     "@nestjs/common": "^10.1.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
-    "@nestjs/jwt": "^9.0.0",
+    "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^9.4.0",
     "@nestjs/serve-static": "^3.0.1",
@@ -36,7 +36,7 @@
     "archiver": "^5.3.1",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
-    "class-validator": "^0.13.2",
+    "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
@@ -49,7 +49,8 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5",
     "typeorm": "^0.3.10",
-    "typeorm-seeding": "^1.6.1"
+    "typeorm-seeding": "^1.6.1",
+    "yarn": "^1.22.21"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
