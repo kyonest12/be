@@ -46,7 +46,7 @@ export class SearchService {
                 userId: user.id,
             })
             .orderBy({
-                'post.id': 'ASC',
+                'post.id': 'DESC',
                 'image.order': 'ASC',
             })
             .where('blocked.id IS NULL')

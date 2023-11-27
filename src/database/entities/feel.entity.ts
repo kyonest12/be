@@ -1,15 +1,8 @@
-import {
-    BaseEntity,
-    Column,
-    CreateDateColumn,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { FeelType } from '../../constants/feel-type.enum';
 import { Post } from './post.entity';
 import { User } from './user.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity('feels')
 export class Feel extends BaseEntity {
@@ -21,6 +14,9 @@ export class Feel extends BaseEntity {
 
     @Column({ type: 'int2' })
     type: FeelType;
+
+    @Column({ type: 'bool', default: false })
+    editable: boolean;
 
     @Column({ type: 'int' })
     userId: number;

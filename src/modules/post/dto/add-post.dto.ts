@@ -2,6 +2,7 @@ import { FileValidator, ParseFilePipe } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { FilesArrayMaxSizeValidator, FilesArrayTypeValidator } from '../../../utils/image-validation.util';
 import { Allow, IsOptional, IsString } from 'class-validator';
+import { mbToBits } from '../../../utils/mb-to-bits.util';
 
 export class AddPostDto {
     @ApiProperty({ required: false, type: 'array', items: { type: 'file' } })
@@ -29,11 +30,11 @@ export class AddPostDto {
 
 class AddPostFilesValidator extends FileValidator {
     videoValidator = {
-        maxSize: new FilesArrayMaxSizeValidator({ maxSize: 671088640 }),
+        maxSize: new FilesArrayMaxSizeValidator({ maxSize: mbToBits(512) }),
         fileType: new FilesArrayTypeValidator({ fileType: /mp4/ }),
     };
     imageValidator = {
-        maxSize: new FilesArrayMaxSizeValidator({ maxSize: 209715200 }),
+        maxSize: new FilesArrayMaxSizeValidator({ maxSize: mbToBits(25) }),
         fileType: new FilesArrayTypeValidator({ fileType: /jpeg|png|jpg|svg/ }),
     };
     message = 'unknown error';

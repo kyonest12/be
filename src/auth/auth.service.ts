@@ -53,7 +53,7 @@ export class AuthService {
         }
 
         const user = new User({
-            email,
+            email: email.toLowerCase(),
             password: await this.hashPassword(password),
             status: AccountStatus.Active,
             username: name,
@@ -69,9 +69,7 @@ export class AuthService {
 
     async login({ email, password, uuid: device_id }: LoginDto) {
         const user = await this.userRepo.findOne({
-            where: {
-                email: email.toLowerCase(),
-            },
+            where: { email: email.toLowerCase() },
         });
 
         if (!user || !(await this.comparePassword(user, password))) {
@@ -190,6 +188,7 @@ export class AuthService {
         const user = verifyCode.user;
         user.password = await this.hashPassword(password);
         user.token = null;
+        await this.userRepo.save(user);
 
         return {};
     }

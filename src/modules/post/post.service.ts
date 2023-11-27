@@ -12,14 +12,7 @@ import { GetPostDto } from './dto/get-post.dto';
 import { FeelType } from '../../constants/feel-type.enum';
 import { MarkType } from '../../constants/mark-type.enum';
 import { costs } from '../../constants/costs.constant';
-import {
-    getBanned,
-    getCanEdit,
-    getCanMark,
-    getCanRate,
-    getCategory,
-    getIsBlocked,
-} from '../../utils/get-post-subdata.util';
+import { getBanned, getCanEdit, getCanMark, getCanRate, getCategory } from '../../utils/get-post-subdata.util';
 import { GetListPostsDto } from './dto/get-list-posts.dto';
 import { Comment } from '../../database/entities/comment.entity';
 import { EditPostDto } from './dto/edit-post.dto';
@@ -28,6 +21,7 @@ import { PostHistory } from '../../database/entities/post-history.entity';
 import { DeletePostDto } from './dto/delete-post.dto';
 import { ReportPostDto } from './dto/report-post.dto';
 import { Report } from '../../database/entities/report.entity';
+import { concurrent } from '../../utils/concurrent.util';
 
 @Injectable()
 export class PostService {
@@ -115,7 +109,9 @@ export class PostService {
             .leftJoinAndSelect('author.blocking', 'blocking', 'blocking.targetId = :userId', {
                 userId: user.id,
             })
-            .where({ id })
+            .where('blocked.id IS NULL')
+            .andWhere('blocking.id IS NULL')
+            .andWhere({ id })
             .orderBy({
                 'image.order': 'ASC',
                 'history.id': 'DESC',
@@ -123,50 +119,50 @@ export class PostService {
             .getOne();
 
         if (!post) {
-            throw new AppException(9994);
+            throw new AppException(9992, 404);
         }
 
-        if (getIsBlocked(post)) {
-            return {
-                id_blocked: '1',
-            };
-        } else {
-            return {
-                id: String(post.id),
-                name: '',
-                created: post.createdAt,
-                described: post.description || '',
-                modified: String(post.edited),
-                fake: String(post.fakeCount),
-                trust: String(post.trustCount),
-                kudos: String(post.kudosCount),
-                disappointed: String(post.disappointedCount),
-                is_rated: post.feelOfUser ? '1' : '0',
-                is_marked: post.markOfUser ? '1' : '0',
-                image: post.images.map((e) => ({
-                    id: String(e.order),
-                    url: e.url,
-                })),
-                video: post.video ? { url: post.video.url } : undefined,
-                author: {
-                    id: String(post.author.id),
-                    name: post.author.username || '',
-                    avatar: post.author.avatar || '',
-                    coins: String(post.author.coins),
-                    listing: post.histories.map((e) => String(e.oldPostId)),
-                },
-                category: getCategory(post),
-                state: post.status || '',
-                is_blocked: '0',
-                can_edit: getCanEdit(post, user),
-                banned: getBanned(post),
-                can_mark: getCanMark(post, user),
-                can_rate: getCanRate(post, user),
-                url: '',
-                messages: '',
-                // deleted: post.deletedAt ? post.deletedAt : undefined,
-            };
-        }
+        return {
+            id: String(post.id),
+            name: '',
+            created: post.createdAt,
+            described: post.description || '',
+            modified: String(post.edited),
+            fake: String(post.fakeCount),
+            trust: String(post.trustCount),
+            kudos: String(post.kudosCount),
+            disappointed: String(post.disappointedCount),
+            is_felt: post.feelOfUser ? String(post.feelOfUser.type) : '-1',
+            is_marked: post.markOfUser ? '1' : '0',
+            your_mark: post.markOfUser
+                ? {
+                      mark_content: post.markOfUser.content,
+                      type_of_mark: String(post.markOfUser.type),
+                  }
+                : undefined,
+            image: post.images.map((e) => ({
+                id: String(e.order),
+                url: e.url,
+            })),
+            video: post.video ? { url: post.video.url } : undefined,
+            author: {
+                id: String(post.author.id),
+                name: post.author.username || '',
+                avatar: post.author.avatar || '',
+                coins: String(post.author.coins),
+                listing: post.histories.map((e) => String(e.oldPostId)),
+            },
+            category: getCategory(post),
+            state: post.status || '',
+            is_blocked: '0',
+            can_edit: getCanEdit(post, user),
+            banned: getBanned(post),
+            can_mark: getCanMark(post, user),
+            can_rate: getCanRate(post, user),
+            url: '',
+            messages: '',
+            deleted: post.deletedAt ? post.deletedAt : undefined,
+        };
     }
 
     async getListPosts(user: User, { last_id, index, count }: GetListPostsDto) {
@@ -186,6 +182,8 @@ export class PostService {
             .leftJoinAndSelect('author.blocking', 'blocking', 'blocking.targetId = :userId', {
                 userId: user.id,
             })
+            .where('blocked.id IS NULL')
+            .andWhere('blocking.id IS NULL')
             .orderBy({
                 'post.id': 'ASC',
                 'image.order': 'ASC',
@@ -199,53 +197,45 @@ export class PostService {
 
         const posts = await query.getMany();
 
-        for (const post of posts) {
-            if (post.marksCount) {
-                post.commentsCount = await this.commentRepo
-                    .createQueryBuilder('comment')
-                    .innerJoin('comment.mark', 'mark')
-                    .where({ 'mark.postId': post.id })
-                    .getCount();
-            } else {
-                post.commentsCount = 0;
-            }
-        }
+        await concurrent(
+            posts.map((post) => async () => {
+                if (post.marksCount) {
+                    post.commentsCount = await this.commentRepo.countBy({
+                        mark: { postId: post.id },
+                    });
+                } else {
+                    post.commentsCount = 0;
+                }
+            }),
+        );
 
         const lastId = posts.at(-1)?.id as number;
         const newItems = await this.postRepo.countBy({ id: MoreThan(lastId) });
 
         return {
-            post: posts.map((post) => {
-                if (getIsBlocked(post)) {
-                    return {
-                        id_blocked: '1',
-                    };
-                } else {
-                    return {
-                        id: String(post.id),
-                        name: '',
-                        image: post.images.map((e) => ({
-                            id: String(e.order),
-                            url: e.url,
-                        })),
-                        video: post.video ? { url: post.video.url } : undefined,
-                        described: post.description || '',
-                        created: post.createdAt,
-                        feel: String(post.feelsCount),
-                        comment_mark: String(post.marksCount + post.commentsCount),
-                        is_felt: post.feelOfUser ? '1' : '0',
-                        is_blocked: '0',
-                        can_edit: getCanEdit(post, user),
-                        banned: getBanned(post),
-                        state: post.status || '',
-                        author: {
-                            id: String(post.author.id),
-                            name: post.author.username || '',
-                            avatar: post.author.avatar || '',
-                        },
-                    };
-                }
-            }),
+            post: posts.map((post) => ({
+                id: String(post.id),
+                name: '',
+                image: post.images.map((e) => ({
+                    id: String(e.order),
+                    url: e.url,
+                })),
+                video: post.video ? { url: post.video.url } : undefined,
+                described: post.description || '',
+                created: post.createdAt,
+                feel: String(post.feelsCount),
+                comment_mark: String(post.marksCount + post.commentsCount),
+                is_felt: post.feelOfUser ? String(post.feelOfUser.type) : '-1',
+                is_blocked: '0',
+                can_edit: getCanEdit(post, user),
+                banned: getBanned(post),
+                state: post.status || '',
+                author: {
+                    id: String(post.author.id),
+                    name: post.author.username || '',
+                    avatar: post.author.avatar || '',
+                },
+            })),
             new_items: String(newItems),
             last_id: String(lastId),
         };
@@ -267,6 +257,7 @@ export class PostService {
                 .leftJoinAndSelect('post.images', 'image')
                 .leftJoinAndSelect('post.video', 'video')
                 .leftJoinAndSelect('post.marks', 'mark')
+                .leftJoinAndSelect('post.feels', 'feel')
                 .leftJoinAndSelect('mark.comments', 'comment')
                 .where({
                     id,
@@ -275,7 +266,7 @@ export class PostService {
                 .getOne();
 
             if (!post) {
-                throw new AppException(9994, 404);
+                throw new AppException(9992, 404);
             }
 
             let newPost: Post;
@@ -300,6 +291,7 @@ export class PostService {
                         }),
                     edited: post.edited,
                     marks: post.marks,
+                    feels: post.feels,
                 });
             }
 
@@ -335,6 +327,9 @@ export class PostService {
             }
             for (const mark of newPost.marks) {
                 mark.editable = true;
+            }
+            for (const feel of newPost.feels) {
+                feel.editable = true;
             }
 
             if (post !== newPost) {
@@ -373,6 +368,8 @@ export class PostService {
             .leftJoinAndSelect('author.blocking', 'blocking', 'blocking.targetId = :userId', {
                 userId: user.id,
             })
+            .where('blocked.id IS NULL')
+            .andWhere('blocking.id IS NULL')
             .orderBy({ 'post.id': 'ASC' })
             .skip(index)
             .take(count);
@@ -383,54 +380,41 @@ export class PostService {
 
         const posts = await query.getMany();
 
-        for (const post of posts) {
-            post.images = [];
-            if (post.marksCount) {
-                post.commentsCount = await this.commentRepo
-                    .createQueryBuilder('comment')
-                    .innerJoin('comment.mark', 'mark')
-                    .where({ 'mark.postId': post.id })
-                    .getCount();
-            } else {
-                post.commentsCount = 0;
-            }
-        }
+        await concurrent(
+            posts.map((post) => async () => {
+                if (post.marksCount) {
+                    post.commentsCount = await this.commentRepo.countBy({
+                        mark: { postId: post.id },
+                    });
+                } else {
+                    post.commentsCount = 0;
+                }
+            }),
+        );
 
         const lastId = posts.at(-1)?.id as number;
         const newItems = await this.postRepo.countBy({ id: MoreThan(lastId), video: {} });
 
         return {
-            post: posts.map((post) => {
-                if (getIsBlocked(post)) {
-                    return {
-                        id_blocked: '1',
-                    };
-                } else {
-                    return {
-                        id: String(post.id),
-                        name: '',
-                        image: post.images.map((e) => ({
-                            id: String(e.order),
-                            url: e.url,
-                        })),
-                        video: post.video ? { url: post.video.url } : undefined,
-                        described: post.description || '',
-                        created: post.createdAt,
-                        feel: String(post.feelsCount),
-                        comment_mark: String(post.marksCount + post.commentsCount),
-                        is_felt: post.feelOfUser ? '1' : '0',
-                        is_blocked: '0',
-                        can_edit: getCanEdit(post, user),
-                        banned: getBanned(post),
-                        state: post.status || '',
-                        author: {
-                            id: String(post.author.id),
-                            name: post.author.username || '',
-                            avatar: post.author.avatar || '',
-                        },
-                    };
-                }
-            }),
+            post: posts.map((post) => ({
+                id: String(post.id),
+                name: '',
+                video: post.video ? { url: post.video.url } : undefined,
+                described: post.description || '',
+                created: post.createdAt,
+                feel: String(post.feelsCount),
+                comment_mark: String(post.marksCount + post.commentsCount),
+                is_felt: post.feelOfUser ? String(post.feelOfUser.type) : '-1',
+                is_blocked: '0',
+                can_edit: getCanEdit(post, user),
+                banned: getBanned(post),
+                state: post.status || '',
+                author: {
+                    id: String(post.author.id),
+                    name: post.author.username || '',
+                    avatar: post.author.avatar || '',
+                },
+            })),
             new_items: String(newItems),
             last_id: String(lastId),
         };
@@ -447,15 +431,17 @@ export class PostService {
             });
 
             if (!post) {
-                throw new AppException(9994, 404);
+                throw new AppException(9992, 404);
             }
-            await postRepo.delete(post.histories.map((e) => e.oldPostId));
+            if (post.histories.length) {
+                await postRepo.delete(post.histories.map((e) => e.oldPostId));
+            }
             await postRepo.remove(post);
 
             user.coins -= costs.deletePost;
             await userRepo.save(user);
 
-            return user.coins;
+            return { coins: String(user.coins) };
         });
     }
 
@@ -463,7 +449,7 @@ export class PostService {
         const post = await this.postRepo.findOneBy({ id });
 
         if (!post) {
-            throw new AppException(9994, 404);
+            throw new AppException(9992, 404);
         }
 
         const report = new Report({
