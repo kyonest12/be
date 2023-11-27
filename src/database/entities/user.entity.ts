@@ -47,6 +47,9 @@ export class User extends BaseEntity {
     @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.target)
     friendRequested: FriendRequest[];
 
+    @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.user)
+    friendRequesting: FriendRequest[];
+
     @OneToMany(() => Friend, (friend) => friend.user)
     friends: Friend[];
     friendsCount: number;
