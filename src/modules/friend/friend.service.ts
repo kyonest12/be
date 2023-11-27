@@ -11,6 +11,7 @@ import { AppException } from '../../exceptions/app.exception';
 import { SetRequestFriendDto } from './dto/set-request-friend.dto';
 import { BlockService } from '../block/block.service';
 import { AuthService } from '../../auth/auth.service';
+import { AccountStatus } from '../../constants/account-status.enum';
 
 @Injectable()
 export class FriendService {
@@ -151,10 +152,17 @@ export class FriendService {
             .leftJoinAndSelect('user.blocked', 'blocked', 'blocked.userId = :userId', { userId: user.id })
             .leftJoinAndSelect('user.blocking', 'blocking', 'blocking.userId = :userId', { userId: user.id })
             .leftJoinAndSelect('user.friends', 'friend', 'friend.targetId = :targetId', { targetId: user.id })
+            .leftJoinAndSelect('user.friendRequested', 'requested', 'requested.userId = :userId', { userId: user.id })
+            .leftJoinAndSelect('user.friendRequesting', 'requesting', 'requesting.userId = :userId', {
+                userId: user.id,
+            })
             .where({ id: Not(user.id) })
+            .andWhere({ status: Not(AccountStatus.Inactive) })
             .andWhere('friend.id IS NULL')
             .andWhere('blocked.id IS NULL')
             .andWhere('blocking.id IS NULL')
+            .andWhere('requested.id IS NULL')
+            .andWhere('requesting.id IS NULL')
             .loadRelationCountAndMap('user.friendsCount', 'user.friends', 'friend', (qb) =>
                 qb.where({ targetId: user.id }),
             )
