@@ -11,6 +11,7 @@ import { AppException } from '../../exceptions/app.exception';
 import { SetRequestFriendDto } from './dto/set-request-friend.dto';
 import { BlockService } from '../block/block.service';
 import { AuthService } from '../../auth/auth.service';
+import { AccountStatus } from '../../constants/account-status.enum';
 
 @Injectable()
 export class FriendService {
@@ -156,6 +157,7 @@ export class FriendService {
                 userId: user.id,
             })
             .where({ id: Not(user.id) })
+            .andWhere({ status: Not(AccountStatus.Inactive) })
             .andWhere('friend.id IS NULL')
             .andWhere('blocked.id IS NULL')
             .andWhere('blocking.id IS NULL')
