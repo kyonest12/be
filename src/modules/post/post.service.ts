@@ -131,12 +131,7 @@ export class PostService {
             trust: String(post.trustCount),
             kudos: String(post.kudosCount),
             disappointed: String(post.disappointedCount),
-            is_rated: post.feelOfUser ? '1' : '0',
-            your_feel: post.feelOfUser
-                ? {
-                      type: String(post.feelOfUser.type),
-                  }
-                : undefined,
+            is_felt: post.feelOfUser ? String(post.feelOfUser.type) : '-1',
             is_marked: post.markOfUser ? '1' : '0',
             your_mark: post.markOfUser
                 ? {
@@ -229,12 +224,7 @@ export class PostService {
                 created: post.createdAt,
                 feel: String(post.feelsCount),
                 comment_mark: String(post.marksCount + post.commentsCount),
-                is_felt: post.feelOfUser ? '1' : '0',
-                your_feel: post.feelOfUser
-                    ? {
-                          type: String(post.feelOfUser.type),
-                      }
-                    : undefined,
+                is_felt: post.feelOfUser ? String(post.feelOfUser.type) : '-1',
                 is_blocked: '0',
                 can_edit: getCanEdit(post, user),
                 banned: getBanned(post),
@@ -413,12 +403,7 @@ export class PostService {
                 created: post.createdAt,
                 feel: String(post.feelsCount),
                 comment_mark: String(post.marksCount + post.commentsCount),
-                is_felt: post.feelOfUser ? '1' : '0',
-                your_feel: post.feelOfUser
-                    ? {
-                          type: String(post.feelOfUser.type),
-                      }
-                    : undefined,
+                is_felt: post.feelOfUser ? String(post.feelOfUser.type) : '-1',
                 is_blocked: '0',
                 can_edit: getCanEdit(post, user),
                 banned: getBanned(post),
