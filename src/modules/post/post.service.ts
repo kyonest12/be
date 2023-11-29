@@ -41,7 +41,6 @@ export class PostService {
     ) {}
 
     async addPost(user: User, body: AddPostDto, images?: Array<Express.Multer.File>, video?: Express.Multer.File) {
-        console.log(user);
         return this.dataSource.transaction(async (manager) => {
             const userRepo = manager.getRepository(User);
             const postRepo = manager.getRepository(Post);

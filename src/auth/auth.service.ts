@@ -47,23 +47,22 @@ export class AuthService {
         return {};
     }
 
-    async signup({ email, password, birthday, name }: SignupDto) {
+    async signup({ email, password, name, birthday }: SignupDto) {
         if (await this.doesEmailExist(email)) {
             throw new AppException(9996);
         }
-
+        const datea = new Date(birthday);
         const user = new User({
             email: email.toLowerCase(),
             password: await this.hashPassword(password),
-            status: AccountStatus.Active,
+            status: AccountStatus.Inactive,
             username: name,
             coins: 50,
-            birthday: birthday,
+            birthday: datea,
         });
 
         console.log(user.password);
         await this.userRepo.save(user);
-        console.log("success")
         return this.getVerifyCode(email);
     }
 
@@ -124,7 +123,19 @@ export class AuthService {
         if (!user || user?.status === AccountStatus.Inactive) {
             throw new AppException(9995);
         }
+        return user;
+    }
 
+    async getUserByToken(token: string): Promise<User> {
+        const user = await this.userRepo.findOne({
+            where: {
+                token,
+            },
+        });
+
+        if (!user || user?.status === AccountStatus.Inactive) {
+            throw new AppException(9995);
+        }
         return user;
     }
 

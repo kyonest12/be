@@ -18,6 +18,7 @@ export class SignupDto {
     name: string;
 
     @ApiProperty({ example: '1907-11-24T08:23:10.555Z' })
+    @IsString()
     @IsNotEmpty()
-    birthday: Date;
+    birthday: string;
 }

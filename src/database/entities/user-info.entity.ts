@@ -1,6 +1,5 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
-import { BaseEntity } from './base.entity';
 
 @Entity('user_info')
 export class UserInfo extends BaseEntity {
@@ -21,9 +20,6 @@ export class UserInfo extends BaseEntity {
 
     @Column({ type: 'varchar', nullable: true })
     country: string | null;
-
-    @Column({ type: 'varchar', nullable: true })
-    birthday: Date | null;
 
     @Column({ type: 'varchar', nullable: true })
     link: string | null;
